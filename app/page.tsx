@@ -22,35 +22,26 @@ export default function Home() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero" aria-labelledby="hero-title">
-          <Image
-            src="/images/dharohar/brand/dharohar-hero-tableau.webp"
-            alt="Dharohar copper and brass vessels arranged in a warm heritage interior"
-            fill
-            priority
-            sizes="100vw"
-          />
-          <div className="hero-shade" />
-          <div className="shell hero-content">
-            <p className="eyebrow eyebrow-gold">The heritage kitchen, reimagined</p>
-            <h1 id="hero-title">Made for today.<br /><em>Carried forward.</em></h1>
-            <p className="hero-intro">Handcrafted copper, peetal and kansa objects chosen for daily rituals, considered spaces and gifts with a life beyond the occasion.</p>
-            <div className="hero-actions">
-              <Link className="button button-gold" href="/collections/all">Shop the collection</Link>
-              <Link className="button button-ghost" href="#shop-by-space">Shop by space</Link>
+        <section className="section shell space-priority-section commerce-entry" id="shop-by-space" aria-labelledby="audience-title">
+          <div className="section-heading audience-heading commerce-entry-heading">
+            <div>
+              <p className="eyebrow">Shop by space</p>
+              <h1 id="audience-title">Choose for where it belongs.</h1>
             </div>
-            <div className="hero-note">
-              <span>34 launch pieces</span>
-              <span>Four collections</span>
-              <span>One enduring standard</span>
-            </div>
+            <div><p>Start with the setting—from a family kitchen to hospitality, workplace, design project or meaningful gift.</p><Link className="text-link" href="/collections/all">Browse all 34 products <span aria-hidden="true">→</span></Link></div>
+          </div>
+          <div className="audience-grid">
+            {Object.entries(audienceContent).map(([slug, audience]) => <Link className="audience-card" href={`/shop-for/${slug}`} key={slug}>
+              <Image src={audience.image} alt="" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="image-shade" />
+              <div><small>{audience.eyebrow}</small><h3>{audience.name}</h3><p>{audience.description}</p><strong>Explore <span aria-hidden="true">→</span></strong></div>
+            </Link>)}
           </div>
         </section>
 
-        <section className="section shell category-first" aria-labelledby="category-title">
+        <section className="section shell category-first product-category-entry" aria-labelledby="category-title">
           <div className="section-heading split-heading">
             <div>
-              <p className="eyebrow">Enter through the object</p>
+              <p className="eyebrow">Shop by product</p>
               <h2 id="category-title">Shop the collection.</h2>
             </div>
             <p>Four clear families make it easy to begin with one useful piece or compose a complete material story.</p>
@@ -68,20 +59,6 @@ export default function Home() {
                 </div>
               </Link>
             ))}
-          </div>
-        </section>
-
-        <section className="section shell space-priority-section" id="shop-by-space" aria-labelledby="audience-title">
-          <div className="section-heading audience-heading">
-            <p className="eyebrow">Made for your world</p>
-            <h2 id="audience-title">Made for the spaces where life gathers.</h2>
-            <p>Choose the context first—from a family kitchen to hospitality, workplace, project or meaningful gift.</p>
-          </div>
-          <div className="audience-grid">
-            {Object.entries(audienceContent).map(([slug, audience], index) => <Link className={`audience-card ${index === 0 || index === 5 ? "audience-card-wide" : ""}`} href={`/shop-for/${slug}`} key={slug}>
-              <Image src={audience.image} alt="" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="image-shade" />
-              <div><small>{audience.eyebrow}</small><h3>{audience.name}</h3><p>{audience.description}</p><strong>Explore <span aria-hidden="true">→</span></strong></div>
-            </Link>)}
           </div>
         </section>
 

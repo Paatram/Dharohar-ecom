@@ -23,12 +23,14 @@ test("server-renders the Dharohar storefront", async () => {
   const html = await response.text();
   const text = visibleText(html);
   assert.match(text, /The Heritage Kitchen, Reimagined/i);
-  assert.match(text, /Made for today/i);
+  assert.match(text, /Choose for where it belongs/i);
   assert.match(text, /Households/);
   assert.match(text, /Interior Designers/);
   assert.match(text, /Shop the collection/);
-  assert.ok(text.indexOf("Shop the collection.") < text.indexOf("Made in India"), "categories must appear immediately after the hero");
-  assert.ok(text.indexOf("Made for the spaces where life gathers") < text.indexOf("Made in India"), "space-led shopping must be prioritised above supporting assurances and product rows");
+  assert.ok(text.indexOf("Choose for where it belongs") < text.indexOf("Shop the collection."), "space-led shopping must be the first storefront section");
+  assert.ok(text.indexOf("Shop the collection.") < text.indexOf("Made in India"), "product categories must remain above supporting assurances");
+  assert.doesNotMatch(html, /class="hero"|dharohar-hero-tableau/, "the ecommerce homepage must not render a campaign hero");
+  assert.doesNotMatch(html, /#b78b3c|#e2c580|226,\s*197,\s*128/i, "legacy gold-brown theme values must not return");
   assert.match(text, /Every piece, one place/);
   assert.match(text, /All products 34/);
   assert.match(html, /category-filter-toggles/);
