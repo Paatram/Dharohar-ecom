@@ -30,6 +30,8 @@ test("server-renders the Dharohar storefront", async () => {
   assert.ok(text.indexOf("Shop the collection.") < text.indexOf("Made in India"), "categories must appear immediately after the hero");
   assert.match(text, /Shop by category/);
   assert.match(text, /View all Cookware/);
+  assert.match(text, /All products/);
+  assert.match(text, /Hospitality/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 

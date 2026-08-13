@@ -106,6 +106,27 @@ export function SiteHeader() {
             </details>
           </div>
         </div>
+        <nav className="category-nav shell" aria-label="Shop product categories">
+          <Link className="category-nav-all" href="/collections/all">All products</Link>
+          {Object.entries(categoryContent).map(([slug, category]) => {
+            const categoryProducts = featuredProducts.filter((product) => product.category === slug).slice(0, 2);
+            return <details className="category-nav-menu" key={slug}>
+              <summary>{category.name}</summary>
+              <div className="category-nav-dropdown">
+                <div>
+                  <p className="menu-kicker">{category.name}</p>
+                  <Link className="category-nav-view-all" href={`/collections/${slug}`}>View all {category.name} →</Link>
+                </div>
+                <ul>
+                  {subcategoryContent[slug as ProductCategory].map((subcategory) => <li key={subcategory.slug}><Link href={`/collections/${slug}/${subcategory.slug}`}><strong>{subcategory.name}</strong><small>{subcategory.productSlugs.length} {subcategory.productSlugs.length === 1 ? "product" : "products"}</small></Link></li>)}
+                </ul>
+                {categoryProducts.length ? <div className="category-nav-featured"><p className="menu-kicker">Featured products</p>{categoryProducts.map((product) => <Link key={product.slug} href={`/products/${product.slug}`}>{product.name}<span aria-hidden="true">→</span></Link>)}</div> : null}
+              </div>
+            </details>;
+          })}
+          <Link href="/shop-for/gifting">Gifting</Link>
+          <Link href="/shop-for/restaurants">Hospitality</Link>
+        </nav>
       </header>
     </>
   );
