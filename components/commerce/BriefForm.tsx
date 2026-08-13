@@ -1,5 +1,6 @@
 "use client";
 
+import { FileDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const serviceLabels: Record<string, string> = {
@@ -11,13 +12,37 @@ const serviceLabels: Record<string, string> = {
   weddings: "Wedding gifting",
 };
 
+function createReference(prefix: string) {
+  const now = new Date();
+  return `${prefix}-${now.toISOString().slice(0, 10).replaceAll("-", "")}-${now.getTime().toString().slice(-5)}`;
+}
+
+function downloadDraft(filename: string, content: string) {
+  const url = URL.createObjectURL(new Blob([content], { type: "text/plain;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function formatDraft(title: string, reference: string, form: HTMLFormElement) {
+  const values = new FormData(form);
+  const lines = Array.from(values.entries())
+    .filter(([, value]) => typeof value === "string")
+    .map(([key, value]) => `${key.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => letter.toUpperCase())}: ${String(value).trim()}`);
+  return [`DHAROHAR — ${title}`, `Reference: ${reference}`, `Prepared: ${new Date().toLocaleString("en-IN")}`, "", ...lines, "", "This is a customer-prepared draft. It has not been transmitted to Dharohar."].join("\n");
+}
+
 export function BriefForm({ initialService = "hospitality" }: { initialService?: string }) {
   const [ready, setReady] = useState(false);
+  const [reference, setReference] = useState("");
+  const [draft, setDraft] = useState("");
   const [service, setService] = useState(serviceLabels[initialService] ? initialService : "hospitality");
   const [quantity, setQuantity] = useState("");
   const [date, setDate] = useState("");
   const readiness = useMemo(() => quantity && date ? "The quantity and required date are ready for feasibility review." : "Add quantity and date so fulfilment feasibility can be assessed.", [quantity, date]);
-  return <form className="brief-form" onSubmit={(event) => { event.preventDefault(); setReady(true); }}>
+  return <form className="brief-form" onSubmit={(event) => { event.preventDefault(); const nextReference = createReference("DH-BRIEF"); setReference(nextReference); setDraft(formatDraft("PROJECT BRIEF", nextReference, event.currentTarget)); setReady(true); }}>
     <div className="form-grid">
       <label>Project type<select name="service" value={service} onChange={(event) => setService(event.target.value)}>{Object.entries(serviceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <label>Organisation<input name="organisation" autoComplete="organization" placeholder="Company or studio name" required /></label>
@@ -35,7 +60,7 @@ export function BriefForm({ initialService = "hospitality" }: { initialService?:
     <p className="form-readiness">{readiness}</p>
     <label className="consent-field"><input type="checkbox" required /><span>I understand this preview validates the brief in my browser but does not transmit personal data until Dharohar activates its owned, privacy-compliant enquiry channel.</span></label>
     <button className="button button-wine" type="submit">Validate project brief</button>
-    {ready ? <div className="form-success" role="status"><strong>Your brief is complete.</strong><p>No data was transmitted. When the monitored business channel is connected, this same form will submit securely and issue a reference number.</p></div> : null}
+    {ready ? <div className="form-success" role="status"><strong>Your brief is ready · {reference}</strong><p>No data was transmitted. Download the validated brief and keep it ready for the monitored business channel.</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download brief</button></div> : null}
   </form>;
 }
 
@@ -46,12 +71,14 @@ export function TrackingForm() {
 
 export function ContactForm({ subject }: { subject?: string }) {
   const [complete, setComplete] = useState(false);
-  return <form className="brief-form compact-form" onSubmit={(event) => { event.preventDefault(); setComplete(true); }}>
+  const [reference, setReference] = useState("");
+  const [draft, setDraft] = useState("");
+  return <form className="brief-form compact-form" onSubmit={(event) => { event.preventDefault(); const nextReference = createReference("DH-ENQUIRY"); setReference(nextReference); setDraft(formatDraft("CUSTOMER ENQUIRY", nextReference, event.currentTarget)); setComplete(true); }}>
     <div className="form-grid"><label>Name<input name="name" autoComplete="name" required /></label><label>Email<input name="email" type="email" autoComplete="email" required /></label></div>
     <label>Subject<input name="subject" defaultValue={subject} required /></label>
     <label>Question or enquiry<textarea name="message" rows={6} required /></label>
     <label className="consent-field"><input type="checkbox" required /><span>I understand this preview validates the enquiry in my browser but does not transmit it until Dharohar activates its monitored contact channel.</span></label>
     <button className="button button-wine" type="submit">Validate enquiry</button>
-    {complete ? <div className="form-success" role="status"><strong>Your enquiry is complete but has not been sent.</strong><p>A verified business inbox and privacy-controlled lead endpoint are still required for transmission.</p></div> : null}
+    {complete ? <div className="form-success" role="status"><strong>Your enquiry draft is ready · {reference}</strong><p>It has not been sent. Download it now; live transmission still requires a verified business inbox and privacy-controlled lead endpoint.</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download enquiry</button></div> : null}
   </form>;
 }

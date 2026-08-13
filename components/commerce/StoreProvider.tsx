@@ -7,6 +7,8 @@ type StoreState = {
   cart: CartLine[];
   wishlist: string[];
   compare: string[];
+  giftWrap: boolean;
+  giftMessage: string;
   cartOpen: boolean;
   searchOpen: boolean;
   addToCart: (slug: string, quantity?: number) => void;
@@ -14,6 +16,8 @@ type StoreState = {
   removeFromCart: (slug: string) => void;
   toggleWishlist: (slug: string) => void;
   toggleCompare: (slug: string) => void;
+  setGiftWrap: (enabled: boolean) => void;
+  setGiftMessage: (message: string) => void;
   setCartOpen: (open: boolean) => void;
   setSearchOpen: (open: boolean) => void;
 };
@@ -25,6 +29,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [compare, setCompare] = useState<string[]>([]);
+  const [giftWrap, setGiftWrap] = useState(false);
+  const [giftMessage, setGiftMessage] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -32,10 +38,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
-        const saved = JSON.parse(localStorage.getItem(storageKey) ?? "{}") as Partial<Pick<StoreState, "cart" | "wishlist" | "compare">>;
+        const saved = JSON.parse(localStorage.getItem(storageKey) ?? "{}") as Partial<Pick<StoreState, "cart" | "wishlist" | "compare" | "giftWrap" | "giftMessage">>;
         if (Array.isArray(saved.cart)) setCart(saved.cart.filter((line) => typeof line?.slug === "string" && Number.isInteger(line.quantity) && line.quantity > 0));
         if (Array.isArray(saved.wishlist)) setWishlist(saved.wishlist.filter((slug): slug is string => typeof slug === "string"));
         if (Array.isArray(saved.compare)) setCompare(saved.compare.filter((slug): slug is string => typeof slug === "string").slice(0, 3));
+        if (typeof saved.giftWrap === "boolean") setGiftWrap(saved.giftWrap);
+        if (typeof saved.giftMessage === "string") setGiftMessage(saved.giftMessage.slice(0, 240));
       } catch { /* Ignore malformed browser storage. */ }
       setHydrated(true);
     }, 0);
@@ -44,8 +52,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(storageKey, JSON.stringify({ cart, wishlist, compare }));
-  }, [cart, wishlist, compare, hydrated]);
+    localStorage.setItem(storageKey, JSON.stringify({ cart, wishlist, compare, giftWrap, giftMessage }));
+  }, [cart, wishlist, compare, giftWrap, giftMessage, hydrated]);
 
   const addToCart = useCallback((slug: string, quantity = 1) => {
     setCart((current) => current.some((line) => line.slug === slug)
@@ -58,7 +66,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const toggleWishlist = useCallback((slug: string) => setWishlist((current) => current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug]), []);
   const toggleCompare = useCallback((slug: string) => setCompare((current) => current.includes(slug) ? current.filter((item) => item !== slug) : current.length < 3 ? [...current, slug] : [...current.slice(1), slug]), []);
 
-  const value = useMemo(() => ({ cart, wishlist, compare, cartOpen, searchOpen, addToCart, setQuantity, removeFromCart, toggleWishlist, toggleCompare, setCartOpen, setSearchOpen }), [cart, wishlist, compare, cartOpen, searchOpen, addToCart, setQuantity, removeFromCart, toggleWishlist, toggleCompare]);
+  const value = useMemo(() => ({ cart, wishlist, compare, giftWrap, giftMessage, cartOpen, searchOpen, addToCart, setQuantity, removeFromCart, toggleWishlist, toggleCompare, setGiftWrap, setGiftMessage, setCartOpen, setSearchOpen }), [cart, wishlist, compare, giftWrap, giftMessage, cartOpen, searchOpen, addToCart, setQuantity, removeFromCart, toggleWishlist, toggleCompare]);
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 

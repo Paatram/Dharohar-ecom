@@ -28,14 +28,17 @@ test("server-renders the Dharohar storefront", async () => {
   assert.match(text, /Interior Designers/);
   assert.match(text, /Shop the collection/);
   assert.ok(text.indexOf("Shop the collection.") < text.indexOf("Made in India"), "categories must appear immediately after the hero");
+  assert.ok(text.indexOf("Made for the spaces where life gathers") < text.indexOf("Made in India"), "space-led shopping must be prioritised above supporting assurances and product rows");
   assert.match(text, /Shop by category/);
   assert.match(text, /View all Cookware/);
   assert.match(text, /All products/);
-  assert.match(text, /Hospitality/);
+  assert.match(text, /Hotels/);
   assert.match(html, /class="nav-trigger"/);
   assert.doesNotMatch(html, /<details class="nav-menu"/);
+  assert.equal((html.match(/class="site-header"/g) ?? []).length, 1, "the storefront must render one unified site header");
+  assert.doesNotMatch(html, /class="announcement|class="category-nav/, "secondary stacked navigation rows must not return");
   assert.match(html, /aria-controls="mobile-drawer"/);
-  assert.match(text, /Discover/);
+  assert.match(text, /Care Circle/);
   assert.match(text, /Trade/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
@@ -52,6 +55,15 @@ test("server-renders a launch product with accurate gating", async () => {
   assert.match(text, /Add to selection bag/);
   assert.match(text, /Check delivery readiness/);
   assert.doesNotMatch(html, /schema.org\/(InStock|LimitedAvailability|PreOrder)/);
+});
+
+test("server-renders the device-private Care Circle workflow", async () => {
+  const response = await render("/care");
+  assert.equal(response.status, 200);
+  const text = visibleText(await response.text());
+  assert.match(text, /Keep care close to the object/i);
+  assert.match(text, /Save my care plan/i);
+  assert.match(text, /Stored only in this browser/i);
 });
 
 for (const [pathname, expected] of [

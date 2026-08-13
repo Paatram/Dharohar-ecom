@@ -81,6 +81,20 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="section shell space-priority-section" id="shop-by-space" aria-labelledby="audience-title">
+          <div className="section-heading audience-heading">
+            <p className="eyebrow">Made for your world</p>
+            <h2 id="audience-title">Made for the spaces where life gathers.</h2>
+            <p>Choose the context first—from a family kitchen to hospitality, workplace, project or meaningful gift.</p>
+          </div>
+          <div className="audience-grid">
+            {Object.entries(audienceContent).map(([slug, audience], index) => <Link className={`audience-card ${index === 0 || index === 5 ? "audience-card-wide" : ""}`} href={`/shop-for/${slug}`} key={slug}>
+              <Image src={audience.image} alt="" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="image-shade" />
+              <div><small>{audience.eyebrow}</small><h3>{audience.name}</h3><p>{audience.description}</p><strong>Explore <span aria-hidden="true">→</span></strong></div>
+            </Link>)}
+          </div>
+        </section>
+
         <section className="assurance-strip" aria-label="Dharohar assurances">
           <div className="shell assurance-grid">
             {assurances.map(([number, title, description]) => (
@@ -116,48 +130,17 @@ export default function Home() {
           <nav aria-label="Shop products by use">{Object.entries(useLabels).map(([slug, label]) => <Link key={slug} href={`/collections/all?use=${slug}`}><span>{label}</span><strong aria-hidden="true">→</strong></Link>)}</nav>
         </section>
 
-        <section className="section shell" id="shop-by-space" aria-labelledby="audience-title">
-          <div className="section-heading audience-heading">
-            <p className="eyebrow">Enter through your world</p>
-            <h2 id="audience-title">Made for the spaces where life gathers.</h2>
-            <p>Every Dharohar piece belongs to a product collection and to the context in which it will be used.</p>
-          </div>
-          <div className="audience-grid">
-            {Object.entries(audienceContent).map(([slug, audience], index) => (
-              <Link className={`audience-card ${index === 0 || index === 5 ? "audience-card-wide" : ""}`} href={`/shop-for/${slug}`} key={slug}>
-                <Image src={audience.image} alt="" fill sizes="(max-width: 760px) 100vw, 50vw" />
-                <div className="image-shade" />
-                <div>
-                  <small>{audience.eyebrow}</small>
-                  <h3>{audience.name}</h3>
-                  <p>{audience.description}</p>
-                  <strong>Explore <span aria-hidden="true">→</span></strong>
-                </div>
-              </Link>
-            ))}
-          </div>
+        <section className="material-compact shell" aria-labelledby="materials-title">
+          <div><p className="eyebrow">Material clarity</p><h2 id="materials-title">Know what you bring home.</h2></div>
+          <p>Composition, lining, compatibility and care belong on the exact product record. Use our short guide when material matters to your decision.</p>
+          <Link className="text-link" href="/materials">Read the material guide <span aria-hidden="true">→</span></Link>
         </section>
 
-        <section className="material-story" aria-labelledby="materials-title">
-          <div className="shell material-layout">
-            <div className="material-image">
-              <Image src="/images/dharohar/products/brass-patila.webp" alt="Hand-finished brass patila" fill sizes="(max-width: 900px) 100vw, 46vw" />
-            </div>
-            <div className="material-copy">
-              <p className="eyebrow eyebrow-gold">Know what you bring home</p>
-              <h2 id="materials-title">Material before marketing.</h2>
-              <p className="material-intro">Traditional metals ask for clarity. We explain composition, lining, compatibility, care and the natural changes that come with use—before a piece enters your home.</p>
-              <ol>
-                <li><span>01</span><div><h3>Tamra · Copper</h3><p>Responsive, luminous and expressive in the way it develops character.</p><Link href="/collections/all?material=copper">Shop copper →</Link></div></li>
-                <li><span>02</span><div><h3>Peetal · Brass</h3><p>Warm, familiar and suited to generous everyday forms.</p><Link href="/collections/all?material=brass">Shop peetal →</Link></div></li>
-                <li><span>03</span><div><h3>Kansa · Bronze</h3><p>Grounded in tone and weight, with a calm presence at the table.</p><Link href="/collections/all?material=kansa">Shop kansa →</Link></div></li>
-              </ol>
-              <Link className="button button-gold" href="/materials">Explore the material library</Link>
-            </div>
-          </div>
+        <section className="care-home-feature" aria-labelledby="care-home-title">
+          <div className="shell care-home-layout"><div><p className="eyebrow eyebrow-gold">Dharohar Care Circle</p><h2 id="care-home-title">The relationship should not end at purchase.</h2><p>Build a private care rhythm, keep finish-aware guidance close, and enter a future restoration pathway with clear assessment standards.</p></div><div className="care-home-points"><span>01 <strong>Save a care rhythm on this device</strong></span><span>02 <strong>Review by material and frequency</strong></span><span>03 <strong>Prepare for verified restoration support</strong></span><Link className="button button-gold" href="/care">Build my care plan</Link></div></div>
         </section>
 
-        <section className="section shell service-grid" aria-label="Dharohar services">
+        <section className="section shell service-grid service-grid-secondary" aria-label="Dharohar services">
           <article className="service-card service-card-gifting">
             <p className="eyebrow eyebrow-gold">Personalisation & gifting</p>
             <h2>A gift that enters another family’s story.</h2>
@@ -165,10 +148,10 @@ export default function Home() {
             <Link className="button button-ghost" href="/shop-for/gifting">Explore gifting</Link>
           </article>
           <article className="service-card service-card-care">
-            <p className="eyebrow">Craftsmanship care</p>
-            <h2>Use it. Care for it. Restore it.</h2>
-            <p>Material-specific guidance and a restoration pathway keep meaningful objects in circulation.</p>
-            <Link className="button button-wine" href="/care">Understand the care plan</Link>
+            <p className="eyebrow">Trade & projects</p>
+            <h2>Source with a clear brief.</h2>
+            <p>Quantities, finish, GST, destination and required date brought into one feasibility-led project route.</p>
+            <Link className="button button-wine" href="/trade">Prepare a trade brief</Link>
           </article>
         </section>
       </main>
