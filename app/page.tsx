@@ -6,7 +6,9 @@ import { SiteHeader } from "@/components/storefront/SiteHeader";
 import {
   audienceContent,
   categoryContent,
-  featuredProducts,
+  products,
+  type CatalogProduct,
+  type ProductCategory,
 } from "@/lib/catalog";
 
 const assurances = [
@@ -15,6 +17,14 @@ const assurances = [
   ["03", "Considered delivery", "Every piece inspected and packed for its journey."],
   ["04", "Lifetime care", "Guidance, restoration and continuity beyond purchase."],
 ] as const;
+
+const categoryProductRows = (Object.keys(categoryContent) as ProductCategory[]).map((slug) => {
+  const inCategory = products.filter((product) => product.category === slug);
+  const displayOrder = [inCategory[0], inCategory.at(-1), inCategory[1], inCategory.at(-2)]
+    .filter((product): product is CatalogProduct => Boolean(product))
+    .filter((product, index, selected) => selected.findIndex((item) => item.slug === product.slug) === index);
+  return { slug, category: categoryContent[slug], products: displayOrder };
+});
 
 export default function Home() {
   return (
@@ -46,18 +56,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="assurance-strip" aria-label="Dharohar assurances">
-          <div className="shell assurance-grid">
-            {assurances.map(([number, title, description]) => (
-              <article key={number}>
-                <span>{number}</span>
-                <div><h2>{title}</h2><p>{description}</p></div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="section shell" aria-labelledby="category-title">
+        <section className="section shell category-first" aria-labelledby="category-title">
           <div className="section-heading split-heading">
             <div>
               <p className="eyebrow">Enter through the object</p>
@@ -81,19 +80,34 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="section featured-section" aria-labelledby="featured-title">
-          <div className="shell">
-            <div className="section-heading split-heading">
-              <div>
-                <p className="eyebrow eyebrow-gold">First pieces</p>
-                <h2 id="featured-title">Objects to begin with.</h2>
-              </div>
-              <Link className="text-link text-link-light" href="/collections/all">View all 34 pieces <span aria-hidden="true">→</span></Link>
-            </div>
-            <div className="product-grid">
-              {featuredProducts.slice(0, 8).map((product) => <ProductCard product={product} key={product.slug} />)}
-            </div>
+        <section className="assurance-strip" aria-label="Dharohar assurances">
+          <div className="shell assurance-grid">
+            {assurances.map(([number, title, description]) => (
+              <article key={number}>
+                <span>{number}</span>
+                <div><h2>{title}</h2><p>{description}</p></div>
+              </article>
+            ))}
           </div>
+        </section>
+
+        <section className="category-product-sections" aria-labelledby="shop-category-title">
+          <header className="section shell category-sales-heading">
+            <p className="eyebrow">Explore the opening collection</p>
+            <h2 id="shop-category-title">Shop by category.</h2>
+            <p>A considered selection from every product family, followed by the complete catalogue inside each category.</p>
+          </header>
+          {categoryProductRows.map(({ slug, category, products: selectedProducts }, index) => <section className={`category-product-row ${index % 2 ? "category-product-row-tint" : ""}`} aria-labelledby={`${slug}-row-title`} key={slug}>
+            <div className="shell">
+              <div className="category-row-heading">
+                <div><p className="eyebrow">0{index + 1} · Product family</p><h3 id={`${slug}-row-title`}>{category.name}</h3><p>{category.description}</p></div>
+                <Link className="text-link" href={`/collections/${slug}`}>View all {category.name} <span aria-hidden="true">→</span></Link>
+              </div>
+              <div className="product-grid product-grid-light">
+                {selectedProducts.map((product) => <ProductCard product={product} key={product.slug} />)}
+              </div>
+            </div>
+          </section>)}
         </section>
 
         <section className="section shell" id="shop-by-space" aria-labelledby="audience-title">

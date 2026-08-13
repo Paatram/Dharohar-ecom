@@ -5,6 +5,7 @@ import {
   catalogSummary,
   categoryContent,
   products,
+  subcategoryContent,
 } from "../lib/catalog.ts";
 
 test("catalog preserves the supplied launch inventory totals", () => {
@@ -43,4 +44,19 @@ test("customer-facing audience journeys remain complete", () => {
     "offices",
     "restaurants",
   ]);
+});
+
+test("every product belongs to exactly one category subcategory", () => {
+  const assignedSlugs = Object.values(subcategoryContent).flatMap((subcategories) =>
+    subcategories.flatMap((subcategory) => subcategory.productSlugs),
+  );
+  assert.equal(new Set(assignedSlugs).size, assignedSlugs.length, "a product appears in more than one subcategory");
+  assert.deepEqual([...assignedSlugs].sort(), products.map((product) => product.slug).sort());
+  for (const [category, subcategories] of Object.entries(subcategoryContent)) {
+    for (const subcategory of subcategories) {
+      for (const slug of subcategory.productSlugs) {
+        assert.equal(products.find((product) => product.slug === slug)?.category, category, `${slug}: assigned to the wrong category`);
+      }
+    }
+  }
 });

@@ -29,6 +29,13 @@ export type CatalogProduct = {
   featured?: boolean;
 };
 
+export type ProductSubcategory = {
+  slug: string;
+  name: string;
+  description: string;
+  productSlugs: string[];
+};
+
 export const categoryContent: Record<
   ProductCategory,
   { name: string; description: string; image: string }
@@ -557,6 +564,32 @@ export const products: CatalogProduct[] = [
   },
 ];
 
+export const subcategoryContent: Record<ProductCategory, ProductSubcategory[]> = {
+  cookware: [
+    { slug: "tawas", name: "Tawas", description: "Dosa and roti griddles for everyday Indian breads and batters.", productSlugs: ["dosa-tawa", "roti-tawa"] },
+    { slug: "patilas", name: "Patilas", description: "Deep traditional vessels in plain and hammered finishes.", productSlugs: ["hammered-patila", "plain-patila"] },
+    { slug: "kadais-pans", name: "Kadais & Pans", description: "Versatile brass forms for frying, curries and table service.", productSlugs: ["peetal-kadai", "peetal-fry-pan"] },
+    { slug: "lagaans", name: "Lagaans", description: "Wide, low vessels for slow cooking and shared preparations.", productSlugs: ["peetal-lagaan"] },
+  ],
+  drinkware: [
+    { slug: "copper-bottles", name: "Copper Bottles", description: "Personal and bedside copper bottles in distinctive finishes.", productSlugs: ["copper-bottle-lasered", "copper-bottle-uv-meena", "copper-bottle-embossed", "copper-bedroom-bottle-lacquered"] },
+    { slug: "copper-glasses", name: "Copper Glasses", description: "Copper tumblers for daily hydration and hospitality service.", productSlugs: ["copper-glass-lacquered", "copper-glass-antique", "copper-glass-embossed"] },
+    { slug: "bottle-glass-sets", name: "Bottle & Glass Sets", description: "Coordinated copper bottle sets for desks, rooms and gifting.", productSlugs: ["copper-bottle-glass-set-two", "copper-bottle-glass-set-one"] },
+    { slug: "peetal-glass-sets", name: "Peetal Glass Sets", description: "Six-piece brass tumbler sets in plain and antique finishes.", productSlugs: ["peetal-glass-set-plain", "peetal-glass-set-antique"] },
+  ],
+  "kitchen-tools": [
+    { slug: "ladles-serving-tools", name: "Ladles & Serving Tools", description: "Palta, serving spoon and kalchul forms for cooking and service.", productSlugs: ["peetal-palta", "peetal-serving-spoon", "kalchul-peetal"] },
+    { slug: "strainers", name: "Strainers", description: "Purposeful strainers for familiar kitchen rituals.", productSlugs: ["chai-chhanni"] },
+    { slug: "cutlery", name: "Cutlery", description: "Brass forks and spoons for a warm, coordinated table.", productSlugs: ["peetal-fork", "peetal-spoon"] },
+  ],
+  "kitchen-sets": [
+    { slug: "dinner-sets", name: "Dinner Sets", description: "Complete peetal and kansa dining compositions.", productSlugs: ["peetal-dinner-set-plain", "peetal-dinner-set-antique", "kansa-dinner-set-plain"] },
+    { slug: "katori-sets", name: "Katori Sets", description: "Six-piece bowl sets across peetal and kansa finishes.", productSlugs: ["peetal-katori-set-plain", "peetal-katori-set-antique", "kansa-katori-set-plain", "kansa-katori-set-antique"] },
+    { slug: "thali-sets", name: "Thali Sets", description: "Paired peetal and kansa thalis for everyday and ceremonial tables.", productSlugs: ["peetal-thali-set-two", "kansa-thali-set-two"] },
+    { slug: "serving-sets", name: "Serving Sets", description: "Coordinated brass serveware for generous tables and hospitality.", productSlugs: ["peetal-donga-set-glass-lid"] },
+  ],
+};
+
 export const featuredProducts = products.filter((product) => product.featured);
 
 export function formatInr(paise: number) {
@@ -569,6 +602,15 @@ export function formatInr(paise: number) {
 
 export function findProduct(slug: string) {
   return products.find((product) => product.slug === slug);
+}
+
+export function findSubcategory(category: ProductCategory, subcategorySlug: string) {
+  return subcategoryContent[category].find((subcategory) => subcategory.slug === subcategorySlug);
+}
+
+export function productsForSubcategory(subcategory: ProductSubcategory) {
+  const included = new Set(subcategory.productSlugs);
+  return products.filter((product) => included.has(product.slug));
 }
 
 export function catalogSummary() {

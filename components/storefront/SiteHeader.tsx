@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { audienceContent, categoryContent } from "@/lib/catalog";
+import { audienceContent, categoryContent, featuredProducts, subcategoryContent, type ProductCategory } from "@/lib/catalog";
 
 export function SiteHeader() {
   return (
@@ -29,22 +29,32 @@ export function SiteHeader() {
           <nav className="desktop-nav" aria-label="Primary navigation">
             <details className="nav-menu">
               <summary>Shop</summary>
-              <div className="mega-menu mega-menu-products">
-                <div>
-                  <p className="menu-kicker">Shop the collection</p>
-                  <h2>Objects for a lifetime of use.</h2>
-                  <Link href="/collections/all">View all 34 pieces</Link>
+              <div className="mega-menu commerce-mega-menu">
+                <div className="mega-menu-intro">
+                  <p className="menu-kicker">Complete catalogue</p>
+                  <h2>Shop by object.</h2>
+                  <Link href="/collections/all">View all 34 products →</Link>
                 </div>
-                <ul>
+                <div className="mega-category-grid">
                   {Object.entries(categoryContent).map(([slug, category]) => (
-                    <li key={slug}>
-                      <Link href={`/collections/${slug}`}>
-                        <span>{category.name}</span>
-                        <small>{category.description}</small>
-                      </Link>
-                    </li>
+                    <section className="mega-category" key={slug}>
+                      <Link className="mega-category-title" href={`/collections/${slug}`}>{category.name}</Link>
+                      <ul>
+                        {subcategoryContent[slug as ProductCategory].map((subcategory) => (
+                          <li key={subcategory.slug}><Link href={`/collections/${slug}/${subcategory.slug}`}>{subcategory.name}</Link></li>
+                        ))}
+                      </ul>
+                    </section>
                   ))}
-                </ul>
+                </div>
+                <div className="mega-featured-products">
+                  <p className="menu-kicker">Popular pieces</p>
+                  <ul>
+                    {featuredProducts.slice(0, 4).map((product) => (
+                      <li key={product.slug}><Link href={`/products/${product.slug}`}>{product.name}<span aria-hidden="true">→</span></Link></li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </details>
 
@@ -76,9 +86,14 @@ export function SiteHeader() {
               <summary aria-label="Open navigation">Menu</summary>
               <nav aria-label="Mobile navigation">
                 <Link href="/collections/all">Shop all</Link>
-                {Object.entries(categoryContent).map(([slug, category]) => (
-                  <Link key={slug} href={`/collections/${slug}`}>{category.name}</Link>
-                ))}
+                <span>Shop by category</span>
+                {Object.entries(categoryContent).map(([slug, category]) => <details className="mobile-category" key={slug}>
+                  <summary>{category.name}</summary>
+                  <Link href={`/collections/${slug}`}>View all {category.name}</Link>
+                  {subcategoryContent[slug as ProductCategory].map((subcategory) => <Link key={subcategory.slug} href={`/collections/${slug}/${subcategory.slug}`}>{subcategory.name}</Link>)}
+                </details>)}
+                <span>Popular products</span>
+                {featuredProducts.slice(0, 4).map((product) => <Link key={product.slug} href={`/products/${product.slug}`}>{product.name}</Link>)}
                 <span>Shop by space</span>
                 {Object.entries(audienceContent).map(([slug, audience]) => (
                   <Link key={slug} href={`/shop-for/${slug}`}>{audience.name}</Link>

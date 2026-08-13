@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
-import { categoryContent, products, type ProductCategory } from "@/lib/catalog";
+import { categoryContent, products, subcategoryContent, type ProductCategory } from "@/lib/catalog";
 
 type CollectionPageProps = { params: Promise<{ slug: string }> };
 
@@ -56,6 +56,9 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
             ))}
           </nav>
         </div>
+        {category ? <nav className="subcategory-pills shell" aria-label={`${category.name} subcategories`}>
+          {subcategoryContent[slug as ProductCategory].map((subcategory) => <Link href={`/collections/${slug}/${subcategory.slug}`} key={subcategory.slug}>{subcategory.name}<span aria-hidden="true">→</span></Link>)}
+        </nav> : null}
         <section className="section shell collection-products" aria-label={`${title} products`}>
           <div className="product-grid product-grid-light">
             {collectionProducts.map((product) => <ProductCard product={product} key={product.slug} />)}

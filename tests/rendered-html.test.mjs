@@ -12,16 +12,24 @@ async function render(pathname = "/") {
   );
 }
 
+function visibleText(html) {
+  return html.replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ");
+}
+
 test("server-renders the Dharohar storefront", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
-  assert.match(html, /The Heritage Kitchen, Reimagined/i);
-  assert.match(html, /Made for today/i);
-  assert.match(html, /Households/);
-  assert.match(html, /Interior Designers/);
-  assert.match(html, /Shop the collection/);
+  const text = visibleText(html);
+  assert.match(text, /The Heritage Kitchen, Reimagined/i);
+  assert.match(text, /Made for today/i);
+  assert.match(text, /Households/);
+  assert.match(text, /Interior Designers/);
+  assert.match(text, /Shop the collection/);
+  assert.ok(text.indexOf("Shop the collection.") < text.indexOf("Made in India"), "categories must appear immediately after the hero");
+  assert.match(text, /Shop by category/);
+  assert.match(text, /View all Cookware/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
@@ -38,6 +46,10 @@ test("server-renders a launch product with accurate gating", async () => {
 
 for (const [pathname, expected] of [
   ["/collections/all", "34 pieces"],
+  ["/collections/cookware/tawas", "Dosa Tawa"],
+  ["/collections/drinkware/copper-bottles", "Copper Bottle"],
+  ["/collections/kitchen-tools/cutlery", "Peetal Fork"],
+  ["/collections/kitchen-sets/dinner-sets", "Kansa Dinner Set"],
   ["/shop-for/hotels", "Hotels"],
   ["/materials", "Know the metal"],
   ["/our-craft", "Craft should be documented"],
@@ -50,7 +62,7 @@ for (const [pathname, expected] of [
   test(`server-renders ${pathname}`, async () => {
     const response = await render(pathname);
     assert.equal(response.status, 200);
-    assert.match(await response.text(), new RegExp(expected, "i"));
+    assert.match(visibleText(await response.text()), new RegExp(expected, "i"));
   });
 }
 
