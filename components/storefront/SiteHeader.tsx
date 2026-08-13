@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { audienceContent, categoryContent, featuredProducts, subcategoryContent, type ProductCategory } from "@/lib/catalog";
+import { MobileMenu } from "./MobileMenu";
 
 export function SiteHeader() {
   return (
@@ -10,6 +11,7 @@ export function SiteHeader() {
       </div>
       <header className="site-header">
         <div className="shell header-inner">
+          <MobileMenu />
           <Link className="brand" href="/" aria-label="Dharohar home">
             <span className="brand-mark">
               <Image
@@ -27,8 +29,8 @@ export function SiteHeader() {
           </Link>
 
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <details className="nav-menu">
-              <summary>Shop</summary>
+            <div className="nav-menu">
+              <Link className="nav-trigger" href="/collections/all">Shop</Link>
               <div className="mega-menu commerce-mega-menu">
                 <div className="mega-menu-intro">
                   <p className="menu-kicker">Complete catalogue</p>
@@ -56,10 +58,10 @@ export function SiteHeader() {
                   </ul>
                 </div>
               </div>
-            </details>
+            </div>
 
-            <details className="nav-menu">
-              <summary>Shop by space</summary>
+            <div className="nav-menu">
+              <Link className="nav-trigger" href="/#shop-by-space">Shop by space</Link>
               <div className="mega-menu">
                 <div>
                   <p className="menu-kicker">Made for your world</p>
@@ -73,7 +75,7 @@ export function SiteHeader() {
                   ))}
                 </ul>
               </div>
-            </details>
+            </div>
 
             <Link href="/materials">Materials</Link>
             <Link href="/our-craft">Our craft</Link>
@@ -82,36 +84,14 @@ export function SiteHeader() {
 
           <div className="header-actions" aria-label="Shopping actions">
             <Link href="/contact">Enquire</Link>
-            <details className="mobile-menu">
-              <summary aria-label="Open navigation">Menu</summary>
-              <nav aria-label="Mobile navigation">
-                <Link href="/collections/all">Shop all</Link>
-                <span>Shop by category</span>
-                {Object.entries(categoryContent).map(([slug, category]) => <details className="mobile-category" key={slug}>
-                  <summary>{category.name}</summary>
-                  <Link href={`/collections/${slug}`}>View all {category.name}</Link>
-                  {subcategoryContent[slug as ProductCategory].map((subcategory) => <Link key={subcategory.slug} href={`/collections/${slug}/${subcategory.slug}`}>{subcategory.name}</Link>)}
-                </details>)}
-                <span>Popular products</span>
-                {featuredProducts.slice(0, 4).map((product) => <Link key={product.slug} href={`/products/${product.slug}`}>{product.name}</Link>)}
-                <span>Shop by space</span>
-                {Object.entries(audienceContent).map(([slug, audience]) => (
-                  <Link key={slug} href={`/shop-for/${slug}`}>{audience.name}</Link>
-                ))}
-                <Link href="/materials">Materials</Link>
-                <Link href="/our-craft">Our craft</Link>
-                <Link href="/care">Care</Link>
-                <Link href="/contact">Enquire</Link>
-              </nav>
-            </details>
           </div>
         </div>
         <nav className="category-nav shell" aria-label="Shop product categories">
           <Link className="category-nav-all" href="/collections/all">All products</Link>
           {Object.entries(categoryContent).map(([slug, category]) => {
             const categoryProducts = featuredProducts.filter((product) => product.category === slug).slice(0, 2);
-            return <details className="category-nav-menu" key={slug}>
-              <summary>{category.name}</summary>
+            return <div className="category-nav-menu" key={slug}>
+              <Link className="category-nav-trigger" href={`/collections/${slug}`}>{category.name}</Link>
               <div className="category-nav-dropdown">
                 <div>
                   <p className="menu-kicker">{category.name}</p>
@@ -122,7 +102,7 @@ export function SiteHeader() {
                 </ul>
                 {categoryProducts.length ? <div className="category-nav-featured"><p className="menu-kicker">Featured products</p>{categoryProducts.map((product) => <Link key={product.slug} href={`/products/${product.slug}`}>{product.name}<span aria-hidden="true">→</span></Link>)}</div> : null}
               </div>
-            </details>;
+            </div>;
           })}
           <Link href="/shop-for/gifting">Gifting</Link>
           <Link href="/shop-for/restaurants">Hospitality</Link>

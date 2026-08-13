@@ -32,6 +32,9 @@ test("server-renders the Dharohar storefront", async () => {
   assert.match(text, /View all Cookware/);
   assert.match(text, /All products/);
   assert.match(text, /Hospitality/);
+  assert.match(html, /class="nav-trigger"/);
+  assert.doesNotMatch(html, /<details class="nav-menu"/);
+  assert.match(html, /aria-controls="mobile-drawer"/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
