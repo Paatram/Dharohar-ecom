@@ -100,3 +100,33 @@ export async function enforceRateLimit(db: D1Database, request: Request, scope: 
     .bind(key, expiresAt).first<{ count: number }>();
   if ((result?.count ?? maximum + 1) > maximum) throw new CommerceError("rate_limited", "Too many requests. Please wait and try again.", 429);
 }
+
+export async function reserveInventory(db: D1Database, orderId: string, productSlug: string, quantity: number, expiresAt: number) {
+  const now = Date.now();
+  const guarded = await db.prepare("UPDATE products SET inventory_reserved = inventory_reserved + ?, updated_at = ? WHERE slug = ? AND inventory_on_hand - inventory_reserved >= ?")
+    .bind(quantity, now, productSlug, quantity).run();
+  if ((guarded.meta.changes ?? 0) !== 1) throw new CommerceError("insufficient_inventory", "The requested quantity is no longer available.", 409, { productSlug });
+  try {
+    await db.prepare("INSERT INTO inventory_reservations (id, order_id, product_slug, quantity, status, expires_at, created_at, updated_at) VALUES (?, ?, ?, ?, 'active', ?, ?, ?)")
+      .bind(crypto.randomUUID(), orderId, productSlug, quantity, expiresAt, now, now).run();
+  } catch (error) {
+    await db.prepare("UPDATE products SET inventory_reserved = MAX(0, inventory_reserved - ?), updated_at = ? WHERE slug = ?").bind(quantity, Date.now(), productSlug).run();
+    throw error;
+  }
+}
+
+export async function releaseOrderReservations(db: D1Database, orderId: string, status: "released" | "expired") {
+  const reservations = await db.prepare("SELECT id, product_slug, quantity FROM inventory_reservations WHERE order_id = ? AND status = 'active'").bind(orderId).all<{ id: string; product_slug: string; quantity: number }>();
+  const now = Date.now();
+  for (const reservation of reservations.results) {
+    await db.batch([
+      db.prepare("UPDATE products SET inventory_reserved = MAX(0, inventory_reserved - ?), updated_at = ? WHERE slug = ? AND EXISTS (SELECT 1 FROM inventory_reservations WHERE id = ? AND status = 'active')").bind(reservation.quantity, now, reservation.product_slug, reservation.id),
+      db.prepare("UPDATE inventory_reservations SET status = ?, updated_at = ? WHERE id = ? AND status = 'active'").bind(status, now, reservation.id),
+    ]);
+  }
+}
+
+export async function expireReservations(db: D1Database) {
+  const expired = await db.prepare("SELECT DISTINCT order_id FROM inventory_reservations WHERE status = 'active' AND expires_at <= ?").bind(Date.now()).all<{ order_id: string }>();
+  for (const row of expired.results) await releaseOrderReservations(db, row.order_id, "expired");
+}

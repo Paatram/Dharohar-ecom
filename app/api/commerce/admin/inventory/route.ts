@@ -16,20 +16,27 @@ export async function POST(request: Request) {
     const key = `inventory:${idempotency}`;
     const existing = await db.prepare("SELECT response_json FROM idempotency_keys WHERE key = ? AND expires_at > ?").bind(key, Date.now()).first<{ response_json: string | null }>();
     if (existing?.response_json) return json(JSON.parse(existing.response_json));
-    const current = await db.prepare("SELECT inventory_on_hand FROM products WHERE slug = ?").bind(input.productSlug).first<{ inventory_on_hand: number }>();
+    const current = await db.prepare("SELECT inventory_on_hand, inventory_reserved FROM products WHERE slug = ?").bind(input.productSlug).first<{ inventory_on_hand: number; inventory_reserved: number }>();
     if (!current) return json({ ok: false, code: "product_not_found" }, 404);
     const next = current.inventory_on_hand + input.quantity;
-    if (next < 0) return json({ ok: false, code: "negative_inventory", message: "This adjustment would create negative stock." }, 409);
+    if (next < current.inventory_reserved) return json({ ok: false, code: "inventory_reserved", message: "This adjustment would reduce stock below the quantity already reserved for checkout." }, 409);
     const now = Date.now();
     const response = { ok: true, productSlug: input.productSlug, inventoryOnHand: next };
     const hash = await sha256(JSON.stringify(input));
-    await db.batch([
-      db.prepare("UPDATE products SET inventory_on_hand = ?, updated_at = ? WHERE slug = ? AND inventory_on_hand = ?").bind(next, now, input.productSlug, current.inventory_on_hand),
-      db.prepare("INSERT INTO inventory_movements (id, product_slug, movement_type, quantity, reason, actor_id, created_at) VALUES (?, ?, 'manual_adjustment', ?, ?, ?, ?)").bind(crypto.randomUUID(), input.productSlug, input.quantity, input.reason, user.userId, now),
-      db.prepare("INSERT INTO audit_events (id, actor_id, action, subject_type, subject_id, metadata_json, created_at) VALUES (?, ?, 'inventory.adjust', 'product', ?, ?, ?)").bind(crypto.randomUUID(), user.userId, input.productSlug, JSON.stringify({ quantity: input.quantity, reason: input.reason }), now),
-      db.prepare("INSERT INTO idempotency_keys (key, scope, request_hash, response_status, response_json, expires_at, created_at) VALUES (?, 'inventory', ?, 200, ?, ?, ?)").bind(key, hash, JSON.stringify(response), now + 86_400_000, now),
-    ]);
+    const guarded = await db.prepare("UPDATE products SET inventory_on_hand = ?, updated_at = ? WHERE slug = ? AND inventory_on_hand = ? AND inventory_reserved = ?")
+      .bind(next, now, input.productSlug, current.inventory_on_hand, current.inventory_reserved).run();
+    if ((guarded.meta.changes ?? 0) !== 1) throw new CommerceError("inventory_changed", "Inventory changed while this adjustment was being applied. Review the current stock and retry.", 409);
+    try {
+      await db.batch([
+        db.prepare("INSERT INTO inventory_movements (id, product_slug, movement_type, quantity, reason, actor_id, created_at) VALUES (?, ?, 'manual_adjustment', ?, ?, ?, ?)").bind(crypto.randomUUID(), input.productSlug, input.quantity, input.reason, user.userId, now),
+        db.prepare("INSERT INTO audit_events (id, actor_id, action, subject_type, subject_id, metadata_json, created_at) VALUES (?, ?, 'inventory.adjust', 'product', ?, ?, ?)").bind(crypto.randomUUID(), user.userId, input.productSlug, JSON.stringify({ quantity: input.quantity, reason: input.reason }), now),
+        db.prepare("INSERT INTO idempotency_keys (key, scope, request_hash, response_status, response_json, expires_at, created_at) VALUES (?, 'inventory', ?, 200, ?, ?, ?)").bind(key, hash, JSON.stringify(response), now + 86_400_000, now),
+      ]);
+    } catch (error) {
+      await db.prepare("UPDATE products SET inventory_on_hand = ?, updated_at = ? WHERE slug = ? AND inventory_on_hand = ? AND inventory_reserved = ?")
+        .bind(current.inventory_on_hand, Date.now(), input.productSlug, next, current.inventory_reserved).run();
+      throw error;
+    }
     return json(response);
   } catch (error) { return errorResponse(error); }
 }
-

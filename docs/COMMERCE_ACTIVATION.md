@@ -22,7 +22,7 @@ Vercel builds the storefront but has no Cloudflare D1 binding; its commerce APIs
 
 - Run `npm run check` and `npm run build:vercel`.
 - Run `npm run db:migrate:local` before local commerce-flow testing; production migrations are applied from `drizzle/` by the hosting workflow.
-- Apply and inspect every migration in `drizzle/`; confirm the inventory reservation triggers exist.
+- Apply and inspect every migration in `drizzle/`; confirm guarded inventory updates reject a second reservation beyond the available quantity.
 - Test two simultaneous attempts for the final unit of a SKU; only one reservation may succeed.
 - Test webhook retries, duplicate payment events, wrong signatures, wrong amounts and payment arriving after reservation expiry.
 - Test serviceable and unserviceable pincodes, measured package shipment creation, AWB assignment and tracking refresh.

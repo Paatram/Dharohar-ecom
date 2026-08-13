@@ -1,6 +1,6 @@
 import { getChatGPTUser } from "@/app/chatgpt-auth";
 import { orderStartSchema } from "@/lib/commerce/contracts";
-import { enforceRateLimit, reference, sha256, upsertCustomer } from "@/lib/commerce/data";
+import { enforceRateLimit, reference, releaseOrderReservations, reserveInventory, sha256, upsertCustomer } from "@/lib/commerce/data";
 import { CommerceError, errorResponse, json, parseJson } from "@/lib/commerce/http";
 import { createRazorpayOrder } from "@/lib/commerce/providers/razorpay";
 import { buildVerifiedQuote } from "@/lib/commerce/quote";
@@ -21,15 +21,24 @@ export async function POST(request: Request) {
     if (cached) {
       if (cached.request_hash !== requestHash) throw new CommerceError("idempotency_conflict", "This idempotency key was used with different order details.", 409);
       if (cached.response_json) return json(JSON.parse(cached.response_json), cached.response_status ?? 200);
+      throw new CommerceError("request_in_progress", "This checkout request is already being processed.", 409);
     }
 
     const verified = await buildVerifiedQuote(db, input);
     const user = await getChatGPTUser();
     const customerId = user ? await upsertCustomer(db, user) : null;
     if (user && user.email.toLowerCase() !== input.email.toLowerCase()) throw new CommerceError("account_email_mismatch", "Use the email address connected to your signed-in account.", 409);
+    const now = Date.now();
+    const claim = await db.prepare("INSERT OR IGNORE INTO idempotency_keys (key, scope, request_hash, expires_at, created_at) VALUES (?, 'order', ?, ?, ?)")
+      .bind(key, requestHash, now + 86_400_000, now).run();
+    if ((claim.meta.changes ?? 0) !== 1) {
+      const raced = await db.prepare("SELECT request_hash, response_status, response_json FROM idempotency_keys WHERE key = ? AND expires_at > ?").bind(key, now).first<{ request_hash: string; response_status: number | null; response_json: string | null }>();
+      if (raced?.request_hash !== requestHash) throw new CommerceError("idempotency_conflict", "This idempotency key was used with different order details.", 409);
+      if (raced?.response_json) return json(JSON.parse(raced.response_json), raced.response_status ?? 200);
+      throw new CommerceError("request_in_progress", "This checkout request is already being processed.", 409);
+    }
     const orderId = crypto.randomUUID();
     const orderNumber = reference("DH");
-    const now = Date.now();
     const expiresAt = now + 15 * 60_000;
     const statements = [
       db.prepare("INSERT INTO orders (id, order_number, customer_id, email, status, payment_status, fulfillment_status, currency, subtotal_paise, discount_paise, tax_paise, shipping_paise, total_paise, address_json, gift_json, shipping_json, idempotency_key, created_at, updated_at) VALUES (?, ?, ?, ?, 'creating_payment', 'not_started', 'not_fulfilled', 'INR', ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
@@ -44,10 +53,20 @@ export async function POST(request: Request) {
       const lineTax = product.price_includes_tax ? Math.round((line * rate) / (10_000 + rate)) : Math.round((line * rate) / 10_000);
       statements.push(db.prepare("INSERT INTO order_items (id, order_id, product_slug, product_name, unit_price_paise, tax_paise, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)")
         .bind(crypto.randomUUID(), orderId, product.slug, product.name, product.indicative_price_paise, lineTax, item.quantity));
-      statements.push(db.prepare("INSERT INTO inventory_reservations (id, order_id, product_slug, quantity, status, expires_at, created_at, updated_at) VALUES (?, ?, ?, ?, 'active', ?, ?, ?)")
-        .bind(crypto.randomUUID(), orderId, product.slug, item.quantity, expiresAt, now, now));
     }
     await db.batch(statements);
+
+    try {
+      for (const item of input.items) await reserveInventory(db, orderId, item.slug, item.quantity, expiresAt);
+    } catch (error) {
+      await releaseOrderReservations(db, orderId, "released");
+      const failure = JSON.stringify({ ok: false, code: "inventory_unavailable", message: "One or more pieces are no longer available." });
+      await db.batch([
+        db.prepare("UPDATE orders SET status = 'inventory_failed', updated_at = ? WHERE id = ?").bind(Date.now(), orderId),
+        db.prepare("UPDATE idempotency_keys SET response_status = 409, response_json = ? WHERE key = ?").bind(failure, key),
+      ]);
+      throw error;
+    }
 
     try {
       const providerOrder = await createRazorpayOrder({ amountPaise: verified.quote.totalPaise, receipt: orderNumber, notes: { order_id: orderId, order_number: orderNumber } });
@@ -56,15 +75,16 @@ export async function POST(request: Request) {
       await db.batch([
         db.prepare("INSERT INTO payments (id, order_id, provider, provider_order_id, status, amount_paise, created_at, updated_at) VALUES (?, ?, 'razorpay', ?, 'created', ?, ?, ?)").bind(crypto.randomUUID(), orderId, providerOrder.id, verified.quote.totalPaise, now, Date.now()),
         db.prepare("UPDATE orders SET status = 'pending_payment', payment_status = 'pending', updated_at = ? WHERE id = ?").bind(Date.now(), orderId),
-        db.prepare("INSERT INTO idempotency_keys (key, scope, request_hash, response_status, response_json, expires_at, created_at) VALUES (?, 'order', ?, 201, ?, ?, ?)").bind(key, requestHash, JSON.stringify(response), now + 86_400_000, now),
+        db.prepare("UPDATE idempotency_keys SET response_status = 201, response_json = ? WHERE key = ? AND request_hash = ?").bind(JSON.stringify(response), key, requestHash),
       ]);
       return json(response, 201);
     } catch (error) {
       await db.batch([
         db.prepare("UPDATE orders SET status = 'payment_setup_failed', payment_status = 'failed', updated_at = ? WHERE id = ?").bind(Date.now(), orderId),
-        db.prepare("UPDATE inventory_reservations SET status = 'released', updated_at = ? WHERE order_id = ? AND status = 'active'").bind(Date.now(), orderId),
         db.prepare("INSERT INTO order_events (id, order_id, event_type, public_message, created_at) VALUES (?, ?, 'payment_setup_failed', 'Payment could not be started; no payment was taken.', ?)").bind(crypto.randomUUID(), orderId, Date.now()),
+        db.prepare("UPDATE idempotency_keys SET response_status = 503, response_json = ? WHERE key = ?").bind(JSON.stringify({ ok: false, code: "payment_start_failed", message: "Payment could not be started; no payment was taken." }), key),
       ]);
+      await releaseOrderReservations(db, orderId, "released");
       throw error;
     }
   } catch (error) {

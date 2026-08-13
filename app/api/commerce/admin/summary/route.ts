@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/commerce/auth";
-import { ensureCatalogSeeded } from "@/lib/commerce/data";
+import { ensureCatalogSeeded, expireReservations } from "@/lib/commerce/data";
 import { errorResponse, json } from "@/lib/commerce/http";
 import { getDatabase, getProviderReadiness } from "@/lib/commerce/runtime";
 
@@ -10,8 +10,8 @@ export async function GET() {
     await requireAdmin(db);
     await ensureCatalogSeeded(db);
     const now = Date.now();
+    await expireReservations(db);
     await db.batch([
-      db.prepare("UPDATE inventory_reservations SET status = 'expired', updated_at = ? WHERE status = 'active' AND expires_at <= ?").bind(now, now),
       db.prepare("DELETE FROM rate_limits WHERE expires_at <= ?").bind(now),
       db.prepare("DELETE FROM idempotency_keys WHERE expires_at <= ?").bind(now),
     ]);
