@@ -41,8 +41,22 @@ export function BriefForm({ initialService = "hospitality" }: { initialService?:
   const [service, setService] = useState(serviceLabels[initialService] ? initialService : "hospitality");
   const [quantity, setQuantity] = useState("");
   const [date, setDate] = useState("");
+  const [stored, setStored] = useState(false);
   const readiness = useMemo(() => quantity && date ? "The quantity and required date are ready for feasibility review." : "Add quantity and date so fulfilment feasibility can be assessed.", [quantity, date]);
-  return <form className="brief-form" onSubmit={(event) => { event.preventDefault(); const nextReference = createReference("DH-BRIEF"); setReference(nextReference); setDraft(formatDraft("PROJECT BRIEF", nextReference, event.currentTarget)); setReady(true); }}>
+  return <form className="brief-form" onSubmit={async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const localReference = createReference("DH-BRIEF");
+    setDraft(formatDraft("PROJECT BRIEF", localReference, form));
+    const values = Object.fromEntries(new FormData(form).entries());
+    try {
+      const response = await fetch("/api/commerce/enquiries", { method: "POST", headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() }, body: JSON.stringify({ kind: "trade", name: values.name, email: values.email, subject: `${serviceLabels[service]} project brief`, payload: values, consent: true }) });
+      const result = await response.json() as { reference?: string };
+      if (!response.ok) throw new Error();
+      setReference(result.reference ?? localReference); setStored(true);
+    } catch { setReference(localReference); setStored(false); }
+    setReady(true);
+  }}>
     <div className="form-grid">
       <label>Project type<select name="service" value={service} onChange={(event) => setService(event.target.value)}>{Object.entries(serviceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <label>Organisation<input name="organisation" autoComplete="organization" placeholder="Company or studio name" required /></label>
@@ -58,27 +72,28 @@ export function BriefForm({ initialService = "hospitality" }: { initialService?:
     <label>Products, finish, presentation or customisation brief<textarea name="brief" rows={6} placeholder="Tell us what is being sourced, how it will be used, and any packaging or engraving requirements." required /></label>
     <label>Reference filename or shared-drive link<input name="reference" placeholder="Uploads activate with secure lead storage" /></label>
     <p className="form-readiness">{readiness}</p>
-    <label className="consent-field"><input type="checkbox" required /><span>I understand this preview validates the brief in my browser but does not transmit personal data until Dharohar activates its owned, privacy-compliant enquiry channel.</span></label>
-    <button className="button button-wine" type="submit">Validate project brief</button>
-    {ready ? <div className="form-success" role="status"><strong>Your brief is ready · {reference}</strong><p>No data was transmitted. Download the validated brief and keep it ready for the monitored business channel.</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download brief</button></div> : null}
+    <label className="consent-field"><input type="checkbox" required /><span>I consent to Dharohar storing this brief to respond to my project enquiry, subject to the Privacy Notice.</span></label>
+    <button className="button button-wine" type="submit">Submit project brief</button>
+    {ready ? <div className="form-success" role="status"><strong>{stored ? "Brief received" : "Secure storage unavailable"} · {reference}</strong><p>{stored ? "Your brief is stored in Dharohar’s private operations ledger. Notification delivery remains subject to the configured business channel." : "Your data was not stored. Download the local draft and try again later."}</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download brief</button></div> : null}
   </form>;
 }
 
 export function TrackingForm() {
   const [message, setMessage] = useState("");
-  return <form className="tracking-form" onSubmit={(event) => { event.preventDefault(); setMessage("No live order lookup is connected in this preview. Tracking activates with authenticated order and carrier data."); }}><label htmlFor="order-number">Order number</label><div><input id="order-number" name="order" placeholder="DH-000000" required /><button className="button button-wine" type="submit">Find order</button></div>{message ? <p role="status">{message}</p> : null}</form>;
+  return <form className="tracking-form" onSubmit={async (event) => { event.preventDefault(); const values = new FormData(event.currentTarget); try { const response = await fetch("/api/commerce/orders/track", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ orderNumber: values.get("order"), email: values.get("email") }) }); const result = await response.json() as { message?: string; order?: { status: string; fulfillment_status: string }; shipment?: { courier?: string; status?: string } }; setMessage(response.ok ? `Order ${result.order?.status.replaceAll("_", " ")} · Fulfilment ${result.order?.fulfillment_status.replaceAll("_", " ")}${result.shipment?.courier ? ` · ${result.shipment.courier}: ${result.shipment.status}` : ""}` : result.message ?? "No order matched those details."); } catch { setMessage("Secure order lookup is temporarily unavailable."); } }}><label htmlFor="order-number">Order number</label><div><input id="order-number" name="order" placeholder="DH-20260814-AB12CD34" required /><input name="email" type="email" autoComplete="email" placeholder="Order email" aria-label="Order email" required /><button className="button button-wine" type="submit">Find order</button></div>{message ? <p role="status">{message}</p> : null}</form>;
 }
 
 export function ContactForm({ subject }: { subject?: string }) {
   const [complete, setComplete] = useState(false);
   const [reference, setReference] = useState("");
   const [draft, setDraft] = useState("");
-  return <form className="brief-form compact-form" onSubmit={(event) => { event.preventDefault(); const nextReference = createReference("DH-ENQUIRY"); setReference(nextReference); setDraft(formatDraft("CUSTOMER ENQUIRY", nextReference, event.currentTarget)); setComplete(true); }}>
+  const [stored, setStored] = useState(false);
+  return <form className="brief-form compact-form" onSubmit={async (event) => { event.preventDefault(); const form = event.currentTarget; const localReference = createReference("DH-ENQUIRY"); setDraft(formatDraft("CUSTOMER ENQUIRY", localReference, form)); const values = Object.fromEntries(new FormData(form).entries()); try { const response = await fetch("/api/commerce/enquiries", { method: "POST", headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() }, body: JSON.stringify({ kind: "retail", name: values.name, email: values.email, subject: values.subject, payload: { message: values.message }, consent: true }) }); const result = await response.json() as { reference?: string }; if (!response.ok) throw new Error(); setReference(result.reference ?? localReference); setStored(true); } catch { setReference(localReference); setStored(false); } setComplete(true); }}>
     <div className="form-grid"><label>Name<input name="name" autoComplete="name" required /></label><label>Email<input name="email" type="email" autoComplete="email" required /></label></div>
     <label>Subject<input name="subject" defaultValue={subject} required /></label>
     <label>Question or enquiry<textarea name="message" rows={6} required /></label>
-    <label className="consent-field"><input type="checkbox" required /><span>I understand this preview validates the enquiry in my browser but does not transmit it until Dharohar activates its monitored contact channel.</span></label>
-    <button className="button button-wine" type="submit">Validate enquiry</button>
-    {complete ? <div className="form-success" role="status"><strong>Your enquiry draft is ready · {reference}</strong><p>It has not been sent. Download it now; live transmission still requires a verified business inbox and privacy-controlled lead endpoint.</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download enquiry</button></div> : null}
+    <label className="consent-field"><input type="checkbox" required /><span>I consent to Dharohar storing this enquiry to respond, subject to the Privacy Notice.</span></label>
+    <button className="button button-wine" type="submit">Submit enquiry</button>
+    {complete ? <div className="form-success" role="status"><strong>{stored ? "Enquiry received" : "Secure storage unavailable"} · {reference}</strong><p>{stored ? "Your enquiry is stored in Dharohar’s private operations ledger." : "Your data was not stored. Download the local draft and try again later."}</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download enquiry</button></div> : null}
   </form>;
 }

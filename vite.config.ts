@@ -1,5 +1,6 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
+import path from "node:path";
 import hostingConfig from "./.openai/hosting.json" with { type: "json" };
 import { sites } from "./plugins/sites-vite-plugin.ts";
 
@@ -20,6 +21,7 @@ const localBindingConfig = {
           binding: d1,
           database_name: "site-creator-d1",
           database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+          migrations_dir: "drizzle",
         },
       ]
     : [],
@@ -40,6 +42,11 @@ export default defineConfig(async () => {
   if (process.env.VERCEL) {
     const { nitro } = await import("nitro/vite");
     return {
+      resolve: {
+        alias: {
+          "cloudflare:workers": path.resolve("lib/cloudflare-workers-stub.ts"),
+        },
+      },
       plugins: [
         vinext(),
         nitro({ vercel: { functions: { runtime: "nodejs22.x" } } }),

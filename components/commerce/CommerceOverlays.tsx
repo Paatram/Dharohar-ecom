@@ -79,7 +79,7 @@ function CartDrawer() {
         {giftWrap ? <label className="gift-message">Gift message<textarea value={giftMessage} maxLength={240} rows={3} onChange={(event) => setGiftMessage(event.target.value)} placeholder="Write a message for the recipient" /><small>{giftMessage.length}/240 · Presentation availability and price are confirmed before launch.</small></label> : null}
         <div className="cart-total"><span>Indicative product total</span><strong>{formatInr(subtotal)}</strong></div>
         <p>GST treatment, delivery fees and serviceability are not yet confirmed and are therefore excluded.</p>
-        <Link className="button button-wine" href="/checkout-readiness" onClick={() => setCartOpen(false)}>Review checkout readiness</Link>
+        <Link className="button button-wine" href="/checkout" onClick={() => setCartOpen(false)}>Secure checkout</Link>
         <Link className="cart-enquire" href="/cart" onClick={() => setCartOpen(false)}>View full selection bag</Link>
         <Link className="cart-enquire" href="/contact" onClick={() => setCartOpen(false)}>Enquire about this selection</Link>
       </footer> : null}

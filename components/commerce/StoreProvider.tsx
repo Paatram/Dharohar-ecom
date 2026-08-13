@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 type CartLine = { slug: string; quantity: number };
 type StoreState = {
@@ -34,6 +34,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const wishlistSyncReady = useRef(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -54,6 +55,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     localStorage.setItem(storageKey, JSON.stringify({ cart, wishlist, compare, giftWrap, giftMessage }));
   }, [cart, wishlist, compare, giftWrap, giftMessage, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let active = true;
+    void fetch("/api/commerce/wishlist", { cache: "no-store" }).then(async (response) => {
+      if (!response.ok || !active) return;
+      const result = await response.json() as { productSlugs?: string[] };
+      const merged = [...new Set([...wishlist, ...(result.productSlugs ?? [])])];
+      setWishlist(merged);
+      wishlistSyncReady.current = true;
+      await fetch("/api/commerce/wishlist", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ productSlugs: merged }) });
+    }).catch(() => { /* Device-local wishlist remains available. */ });
+    return () => { active = false; };
+  // Run once after browser state hydration; later writes use the effect below.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated]);
+
+  useEffect(() => {
+    if (!hydrated || !wishlistSyncReady.current) return;
+    const timer = window.setTimeout(() => {
+      void fetch("/api/commerce/wishlist", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ productSlugs: wishlist }) }).catch(() => { /* Retry on the next signed-in change. */ });
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [wishlist, hydrated]);
 
   const addToCart = useCallback((slug: string, quantity = 1) => {
     setCart((current) => current.some((line) => line.slug === slug)

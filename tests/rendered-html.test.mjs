@@ -72,7 +72,7 @@ test("server-renders the device-private Care Circle workflow", async () => {
   assert.match(text, /Collector Care/i);
   assert.match(text, /No recurring payment is taken today/i);
   assert.match(text, /Save my care plan/i);
-  assert.match(text, /Stored only in this browser/i);
+  assert.match(text, /always saved locally/i);
 });
 
 test("care-plan interest pre-fills the enquiry subject", async () => {
@@ -94,8 +94,8 @@ for (const [pathname, expected] of [
   ["/our-craft", "Craft should be documented"],
   ["/care", "Use leaves a history"],
   ["/shipping-returns", "Shipping terms will open"],
-  ["/privacy", "No customer data collection"],
-  ["/terms", "commercial terms are not yet active"],
+  ["/privacy", "Data is collected only for a clear customer action"],
+  ["/terms", "Commercial terms remain an activation gate"],
   ["/contact?product=peetal-kadai", "Interest in Peetal Kadai"],
   ["/search?q=copper", "Results for"],
   ["/gifting", "Given once"],
@@ -106,6 +106,7 @@ for (const [pathname, expected] of [
   ["/account", "Orders, addresses and care"],
   ["/track-order", "honest order timeline"],
   ["/checkout-readiness", "Checkout opens"],
+  ["/checkout", "Verify every promise before payment"],
   ["/journal", "Useful knowledge"],
   ["/journal/choose-a-traditional-tawa", "traditional tawa"],
   ["/faq", "Questions, answered plainly"],
