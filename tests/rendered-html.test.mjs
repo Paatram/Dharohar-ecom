@@ -29,8 +29,10 @@ test("server-renders the Dharohar storefront", async () => {
   assert.match(text, /Shop the collection/);
   assert.ok(text.indexOf("Shop the collection.") < text.indexOf("Made in India"), "categories must appear immediately after the hero");
   assert.ok(text.indexOf("Made for the spaces where life gathers") < text.indexOf("Made in India"), "space-led shopping must be prioritised above supporting assurances and product rows");
-  assert.match(text, /Shop by category/);
-  assert.match(text, /View all Cookware/);
+  assert.match(text, /Every piece, one place/);
+  assert.match(text, /All products 34/);
+  assert.match(html, /category-filter-toggles/);
+  assert.doesNotMatch(html, /class="category-product-row/);
   assert.match(text, /All products/);
   assert.match(text, /Hotels/);
   assert.match(html, /class="nav-trigger"/);
@@ -62,8 +64,21 @@ test("server-renders the device-private Care Circle workflow", async () => {
   assert.equal(response.status, 200);
   const text = visibleText(await response.text());
   assert.match(text, /Keep care close to the object/i);
+  assert.match(text, /Choose how closely we stay involved/i);
+  assert.match(text, /Care Notes/i);
+  assert.match(text, /Care Circle/i);
+  assert.match(text, /Collector Care/i);
+  assert.match(text, /No recurring payment is taken today/i);
   assert.match(text, /Save my care plan/i);
   assert.match(text, /Stored only in this browser/i);
+});
+
+test("care-plan interest pre-fills the enquiry subject", async () => {
+  const response = await render("/contact?subject=Care%20Circle%20annual%20membership");
+  assert.equal(response.status, 200);
+  const text = visibleText(await response.text());
+  assert.match(text, /Selected enquiry/i);
+  assert.match(text, /Care Circle annual membership/i);
 });
 
 for (const [pathname, expected] of [

@@ -59,7 +59,7 @@ export function SiteHeader() {
         </div>
 
         <Link href="/our-craft">Our craft</Link>
-        <Link className="care-nav-link" href="/care"><HeartHandshake size={16} strokeWidth={1.7} aria-hidden="true" /> Care Circle</Link>
+        <Link className="care-nav-link" href="/care#plans"><HeartHandshake size={16} strokeWidth={1.7} aria-hidden="true" /> Care Plans</Link>
       </nav>
 
       <div className="header-actions" aria-label="Shopping actions"><HeaderCommerceActions /></div>

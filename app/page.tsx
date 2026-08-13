@@ -1,14 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ProductCard } from "@/components/storefront/ProductCard";
+import { HomeProductExplorer } from "@/components/commerce/HomeProductExplorer";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import {
   audienceContent,
   categoryContent,
   products,
-  type CatalogProduct,
-  type ProductCategory,
 } from "@/lib/catalog";
 import { useLabels } from "@/lib/merchandising";
 
@@ -18,14 +16,6 @@ const assurances = [
   ["03", "Considered delivery", "Every piece inspected and packed for its journey."],
   ["04", "Care continuity", "Product-specific guidance designed to remain with the object."],
 ] as const;
-
-const categoryProductRows = (Object.keys(categoryContent) as ProductCategory[]).map((slug) => {
-  const inCategory = products.filter((product) => product.category === slug);
-  const displayOrder = [inCategory[0], inCategory.at(-1), inCategory[1], inCategory.at(-2)]
-    .filter((product): product is CatalogProduct => Boolean(product))
-    .filter((product, index, selected) => selected.findIndex((item) => item.slug === product.slug) === index);
-  return { slug, category: categoryContent[slug], products: displayOrder };
-});
 
 export default function Home() {
   return (
@@ -109,20 +99,10 @@ export default function Home() {
         <section className="category-product-sections" aria-labelledby="shop-category-title">
           <header className="section shell category-sales-heading">
             <p className="eyebrow">Explore the opening collection</p>
-            <h2 id="shop-category-title">Shop by category.</h2>
-            <p>A considered selection from every product family, followed by the complete catalogue inside each category.</p>
+            <h2 id="shop-category-title">Every piece, one place.</h2>
+            <p>See the complete collection together, then use the category toggles to narrow it without leaving the page.</p>
           </header>
-          {categoryProductRows.map(({ slug, category, products: selectedProducts }, index) => <section className={`category-product-row ${index % 2 ? "category-product-row-tint" : ""}`} aria-labelledby={`${slug}-row-title`} key={slug}>
-            <div className="shell">
-              <div className="category-row-heading">
-                <div><p className="eyebrow">0{index + 1} · Product family</p><h3 id={`${slug}-row-title`}>{category.name}</h3><p>{category.description}</p></div>
-                <Link className="text-link" href={`/collections/${slug}`}>View all {category.name} <span aria-hidden="true">→</span></Link>
-              </div>
-              <div className="product-grid product-grid-light">
-                {selectedProducts.map((product) => <ProductCard product={product} key={product.slug} />)}
-              </div>
-            </div>
-          </section>)}
+          <div className="shell"><HomeProductExplorer initialProducts={products} /></div>
         </section>
 
         <section className="use-shortcuts shell" aria-labelledby="shop-by-use-title">
@@ -137,7 +117,7 @@ export default function Home() {
         </section>
 
         <section className="care-home-feature" aria-labelledby="care-home-title">
-          <div className="shell care-home-layout"><div><p className="eyebrow eyebrow-gold">Dharohar Care Circle</p><h2 id="care-home-title">The relationship should not end at purchase.</h2><p>Build a private care rhythm, keep finish-aware guidance close, and enter a future restoration pathway with clear assessment standards.</p></div><div className="care-home-points"><span>01 <strong>Save a care rhythm on this device</strong></span><span>02 <strong>Review by material and frequency</strong></span><span>03 <strong>Prepare for verified restoration support</strong></span><Link className="button button-gold" href="/care">Build my care plan</Link></div></div>
+          <div className="shell care-home-layout"><div><p className="eyebrow eyebrow-gold">Dharohar Care Circle</p><h2 id="care-home-title">The relationship should not end at purchase.</h2><p>Compare care subscription paths, build a private care rhythm, and enter a future restoration pathway with clear assessment standards.</p></div><div className="care-home-points"><span>01 <strong>Choose the right care plan</strong></span><span>02 <strong>Save a care rhythm on this device</strong></span><span>03 <strong>Prepare for verified restoration support</strong></span><Link className="button button-gold" href="/care#plans">View care plans</Link></div></div>
         </section>
 
         <section className="section shell service-grid service-grid-secondary" aria-label="Dharohar services">

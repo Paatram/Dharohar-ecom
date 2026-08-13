@@ -45,7 +45,7 @@ export function CarePlanBuilder() {
   };
   const remove = () => { localStorage.removeItem(storageKey); setPlan(null); };
 
-  return <section className="care-plan-builder" aria-labelledby="care-plan-title">
+  return <section className="care-plan-builder" id="care-plan" aria-labelledby="care-plan-title">
     <div className="care-plan-intro">
       <p className="eyebrow eyebrow-gold">Dharohar Care Circle</p>
       <h2 id="care-plan-title">Keep care close to the object.</h2>

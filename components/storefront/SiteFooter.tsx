@@ -30,7 +30,7 @@ export function SiteFooter() {
           <Link href="/shop-for/gifting">Gifting</Link>
           <Link href="/shop-for/interior-designers">Trade & designers</Link>
           <Link href="/shop-for/restaurants">Restaurants</Link>
-          <Link href="/care">Care & restoration</Link>
+          <Link href="/care#plans">Care plans & restoration</Link>
           <Link href="/trade">Request a trade quote</Link>
           <Link href="/gifting">Gifts by occasion</Link>
         </div>

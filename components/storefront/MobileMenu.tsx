@@ -63,7 +63,7 @@ export function MobileMenu() {
         <div className="mobile-menu-links">
           {featuredProducts.slice(0, 4).map((product) => <Link key={product.slug} href={`/products/${product.slug}`} onClick={close}>{product.name}</Link>)}
         </div>
-        <Link className="mobile-care-callout" href="/care" onClick={close}><HeartHandshake size={21} aria-hidden="true" /><span><strong>Join the Care Circle</strong><small>Build and save your care plan</small></span></Link>
+        <Link className="mobile-care-callout" href="/care#plans" onClick={close}><HeartHandshake size={21} aria-hidden="true" /><span><strong>Explore Care Plans</strong><small>Compare plans and build your care rhythm</small></span></Link>
         <div className="mobile-menu-utility">
           <Link href="/materials" onClick={close}>Materials</Link>
           <Link href="/our-craft" onClick={close}>Our craft</Link>
