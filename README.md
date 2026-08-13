@@ -2,7 +2,21 @@
 
 Premium, DLP-themed commerce storefront for Dharohar's copper, peetal and kansa collection.
 
-The current milestone is an accuracy-gated catalog preview: 34 supplied SKUs and 216 launch units are browsable, while checkout remains intentionally disabled until product, tax, fulfilment and policy data is verified. The intended production commerce core is Medusa + PostgreSQL with Razorpay and Shiprocket integrations.
+The current milestone is an accuracy-gated commerce experience: 34 supplied SKUs and 216 launch units are browsable with predictive search, filters, wishlist, comparison, selection bag, gifting, trade briefs, account/tracking readiness, product education and technical SEO. Checkout remains intentionally disabled until product, tax, fulfilment and policy data is verified. The intended production commerce core is Medusa + PostgreSQL with Razorpay and Shiprocket integrations.
+
+## Implemented customer journeys
+
+- Hover-driven desktop mega-navigation and a clickable mobile drawer
+- Category, subcategory, material, use, price and audience discovery
+- Typo-tolerant predictive search and dedicated search results
+- Device-persistent wishlist, product comparison and selection bag
+- Enriched product pages with delivery-readiness checks, honest pending-data labels, care, related objects and curated ritual bundles
+- Gifting by occasion and budget, with presentation/personalisation readiness
+- Structured trade briefs for hospitality, restaurants, offices, designers and gifting
+- Account, order tracking, returns and checkout readiness surfaces
+- Material/care journal, FAQ structured data, breadcrumbs, sitemap and product structured data without unverified offers or reviews
+
+Browser persistence is for non-authoritative discovery state only. Price, stock, tax, payment and order state remain server-owned in the production architecture.
 
 ## Requirements
 
@@ -29,6 +43,14 @@ npm run check
 npm audit --omit=dev
 ```
 
+## Deployment targets
+
+- OpenAI Sites/Cloudflare uses `npm run build` and the native Worker output in `dist/`.
+- Vercel uses the committed `vercel.json` build override and Nitro’s Vercel Build Output API bundle in `.vercel/output/`.
+- Node is pinned to the Vercel-supported `22.x` major for reproducible builds.
+
+To reproduce the Vercel compilation locally, run `npm run build:vercel`.
+
 `npm run check` runs lint, strict TypeScript, a production build, catalog invariants and server-rendered route tests.
 
 ## Architecture records
@@ -36,6 +58,7 @@ npm audit --omit=dev
 - [Architecture](docs/ARCHITECTURE.md)
 - [Execution sequence](docs/EXECUTION_SEQUENCE.md)
 - [Risk register](docs/RISK_REGISTER.md)
+- [Commerce feature status and activation gates](docs/FEATURE_STATUS.md)
 
 ## Asset status
 

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Manrope, Playfair_Display } from "next/font/google";
+import { CommerceOverlays } from "@/components/commerce/CommerceOverlays";
+import { StoreProvider } from "@/components/commerce/StoreProvider";
+import { absoluteUrl } from "@/lib/site";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -62,9 +65,34 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Dharohar",
+    url: absoluteUrl("/"),
+    logo: absoluteUrl("/images/dharohar/brand/dharohar-mark.png"),
+  };
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Dharohar",
+    url: absoluteUrl("/"),
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${absoluteUrl("/search")}?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
   return (
     <html lang="en-IN">
-      <body className={`${manrope.variable} ${playfair.variable}`}>{children}</body>
+      <body className={`${manrope.variable} ${playfair.variable}`}>
+        <StoreProvider>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+          {children}
+          <CommerceOverlays />
+        </StoreProvider>
+      </body>
     </html>
   );
 }

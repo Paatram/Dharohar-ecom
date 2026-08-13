@@ -44,7 +44,7 @@ export default async function AudiencePage({ params }: AudiencePageProps) {
             <p>{audience.description}</p>
             <div className="hero-actions">
               <Link className="button button-gold" href="#selected-pieces">Explore selected pieces</Link>
-              {requiresConsultation ? <Link className="button button-ghost" href={`/contact?service=${slug}`}>Discuss a project</Link> : null}
+              {requiresConsultation ? <Link className="button button-ghost" href={`/trade?service=${slug}`}>Discuss a project</Link> : null}
             </div>
           </div>
         </section>

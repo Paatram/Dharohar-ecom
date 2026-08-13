@@ -2,12 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { audienceContent, categoryContent, featuredProducts, subcategoryContent, type ProductCategory } from "@/lib/catalog";
 import { MobileMenu } from "./MobileMenu";
+import { HeaderCommerceActions } from "@/components/commerce/CommerceOverlays";
+import { materialStories, useLabels } from "@/lib/merchandising";
 
 export function SiteHeader() {
   return (
     <>
       <div className="announcement">
-        Handcrafted in India <span aria-hidden="true">·</span> Pure metals <span aria-hidden="true">·</span> Lifetime craftsmanship care
+        Heritage metalware <span aria-hidden="true">·</span> Product facts verified before commerce <span aria-hidden="true">·</span> Launch collection preview
       </div>
       <header className="site-header">
         <div className="shell header-inner">
@@ -61,6 +63,14 @@ export function SiteHeader() {
             </div>
 
             <div className="nav-menu">
+              <Link className="nav-trigger" href="/materials">Discover</Link>
+              <div className="mega-menu discover-mega-menu">
+                <section><p className="menu-kicker">Shop by metal</p><h2>Begin with the material.</h2>{Object.entries(materialStories).map(([slug, material]) => <Link key={slug} href={`/collections/all?material=${slug}`}><strong>{material.shortName}</strong><small>{material.description}</small></Link>)}</section>
+                <section><p className="menu-kicker">Shop by use</p><div className="discover-use-grid">{Object.entries(useLabels).map(([slug, label]) => <Link key={slug} href={`/collections/all?use=${slug}`}>{label}<span aria-hidden="true">→</span></Link>)}</div></section>
+              </div>
+            </div>
+
+            <div className="nav-menu">
               <Link className="nav-trigger" href="/#shop-by-space">Shop by space</Link>
               <div className="mega-menu">
                 <div>
@@ -77,14 +87,13 @@ export function SiteHeader() {
               </div>
             </div>
 
-            <Link href="/materials">Materials</Link>
             <Link href="/our-craft">Our craft</Link>
-            <Link href="/care">Care</Link>
+            <div className="nav-menu"><Link className="nav-trigger" href="/gifting">Gifting</Link><div className="mega-menu gifting-mega-menu"><div><p className="menu-kicker">Gifts with a life beyond the occasion</p><h2>Chosen by ritual, recipient and budget.</h2><Link href="/gifting">Explore all gifting →</Link></div><ul><li><Link href="/gifting#occasions">Wedding & housewarming</Link></li><li><Link href="/gifting#budgets">Gifts by budget</Link></li><li><Link href="/trade?service=corporate-gifting">Corporate gifting</Link></li><li><Link href="/gifting#presentation">Presentation & messages</Link></li></ul></div></div>
+            <div className="nav-menu"><Link className="nav-trigger" href="/trade">Trade</Link><div className="mega-menu trade-mega-menu"><div><p className="menu-kicker">For professional briefs</p><h2>Hospitality, workplaces and considered interiors.</h2><Link href="/trade">Request a trade quote →</Link></div><ul className="audience-menu-list">{["offices", "restaurants", "hotels", "interior-designers"].map((slug) => <li key={slug}><Link href={`/shop-for/${slug}`}>{audienceContent[slug as keyof typeof audienceContent].name}</Link></li>)}</ul></div></div>
+            <Link href="/journal">Journal</Link>
           </nav>
 
-          <div className="header-actions" aria-label="Shopping actions">
-            <Link href="/contact">Enquire</Link>
-          </div>
+          <div className="header-actions" aria-label="Shopping actions"><HeaderCommerceActions /></div>
         </div>
         <nav className="category-nav shell" aria-label="Shop product categories">
           <Link className="category-nav-all" href="/collections/all">All products</Link>
@@ -104,8 +113,8 @@ export function SiteHeader() {
               </div>
             </div>;
           })}
-          <Link href="/shop-for/gifting">Gifting</Link>
-          <Link href="/shop-for/restaurants">Hospitality</Link>
+          <Link href="/gifting">Gifting</Link>
+          <Link href="/trade">Trade</Link>
         </nav>
       </header>
     </>

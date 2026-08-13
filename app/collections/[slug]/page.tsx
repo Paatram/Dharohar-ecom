@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ProductCard } from "@/components/storefront/ProductCard";
+import { CollectionExplorer } from "@/components/commerce/CollectionExplorer";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { categoryContent, products, subcategoryContent, type ProductCategory } from "@/lib/catalog";
+import { absoluteUrl } from "@/lib/site";
 
-type CollectionPageProps = { params: Promise<{ slug: string }> };
+type CollectionPageProps = { params: Promise<{ slug: string }>; searchParams: Promise<{ material?: string; use?: string }> };
 
 export function generateStaticParams() {
   return ["all", ...Object.keys(categoryContent)].map((slug) => ({ slug }));
@@ -23,8 +24,9 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
   return { title: category.name, description: category.description, alternates: { canonical: `/collections/${slug}` } };
 }
 
-export default async function CollectionPage({ params }: CollectionPageProps) {
+export default async function CollectionPage({ params, searchParams }: CollectionPageProps) {
   const { slug } = await params;
+  const filters = await searchParams;
   const isAll = slug === "all";
   const category = isAll ? null : categoryContent[slug as ProductCategory];
   if (!isAll && !category) notFound();
@@ -33,11 +35,13 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   const title = category?.name ?? "All Objects";
   const description = category?.description ?? "The complete opening collection: useful objects in copper, peetal and kansa for kitchens, tables, spaces and gifts.";
   const image = category?.image ?? "/images/dharohar/brand/dharohar-hero-tableau.webp";
+  const itemListSchema = { "@context": "https://schema.org", "@type": "ItemList", name: title, numberOfItems: collectionProducts.length, itemListElement: collectionProducts.map((product, index) => ({ "@type": "ListItem", position: index + 1, url: absoluteUrl(`/products/${product.slug}`), name: product.name })) };
 
   return (
     <>
       <SiteHeader />
       <main>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
         <section className="collection-hero">
           <Image src={image} alt="" fill priority sizes="100vw" />
           <div className="image-shade" />
@@ -59,11 +63,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         {category ? <nav className="subcategory-pills shell" aria-label={`${category.name} subcategories`}>
           {subcategoryContent[slug as ProductCategory].map((subcategory) => <Link href={`/collections/${slug}/${subcategory.slug}`} key={subcategory.slug}>{subcategory.name}<span aria-hidden="true">→</span></Link>)}
         </nav> : null}
-        <section className="section shell collection-products" aria-label={`${title} products`}>
-          <div className="product-grid product-grid-light">
-            {collectionProducts.map((product) => <ProductCard product={product} key={product.slug} />)}
-          </div>
-        </section>
+        <section className="section shell collection-products" aria-label={`${title} products`}><CollectionExplorer initialProducts={collectionProducts} initialMaterial={filters.material} initialUse={filters.use} /></section>
       </main>
       <SiteFooter />
     </>

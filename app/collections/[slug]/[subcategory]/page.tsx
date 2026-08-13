@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ProductCard } from "@/components/storefront/ProductCard";
+import { CollectionExplorer } from "@/components/commerce/CollectionExplorer";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import {
@@ -60,9 +60,7 @@ export default async function SubcategoryPage({ params }: SubcategoryPageProps) 
         </nav>
       </div>
       <section className="section shell collection-products" aria-label={`${subcategory.name} products`}>
-        <div className="product-grid product-grid-light">
-          {collectionProducts.map((product) => <ProductCard product={product} key={product.slug} />)}
-        </div>
+        <CollectionExplorer initialProducts={collectionProducts} />
       </section>
     </main>
     <SiteFooter />

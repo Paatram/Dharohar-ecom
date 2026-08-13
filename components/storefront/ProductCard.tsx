@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CatalogProduct, categoryContent, formatInr } from "@/lib/catalog";
+import { ProductCardActions } from "@/components/commerce/ProductActions";
 
 export function ProductCard({ product }: { product: CatalogProduct }) {
   return (
@@ -14,6 +15,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
         />
         <span>{product.material === "brass" ? "Peetal" : product.material === "copper" ? "Tamra" : product.material === "kansa" ? "Kansa" : "Mixed metal"}</span>
       </Link>
+      <ProductCardActions slug={product.slug} />
       <div className="product-card-copy">
         <small>{categoryContent[product.category].name} · {product.finish}</small>
         <h3><Link href={`/products/${product.slug}`}>{product.name}</Link></h3>

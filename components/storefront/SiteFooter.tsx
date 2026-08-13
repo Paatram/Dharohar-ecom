@@ -31,11 +31,16 @@ export function SiteFooter() {
           <Link href="/shop-for/interior-designers">Trade & designers</Link>
           <Link href="/shop-for/restaurants">Restaurants</Link>
           <Link href="/care">Care & restoration</Link>
+          <Link href="/trade">Request a trade quote</Link>
+          <Link href="/gifting">Gifts by occasion</Link>
         </div>
         <div>
           <h3>Help</h3>
           <Link href="/shipping-returns">Shipping & returns</Link>
           <Link href="/contact">Contact</Link>
+          <Link href="/account">Account & orders</Link>
+          <Link href="/track-order">Track an order</Link>
+          <Link href="/faq">Frequently asked questions</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
         </div>

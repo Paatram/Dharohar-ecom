@@ -1,7 +1,7 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json" with { type: "json" };
-import { sites } from "./build/sites-vite-plugin.ts";
+import { sites } from "./plugins/sites-vite-plugin.ts";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
@@ -34,6 +34,19 @@ const localBindingConfig = {
 };
 
 export default defineConfig(async () => {
+  // vinext requires Nitro for non-Cloudflare hosts. Vercel exposes VERCEL=1
+  // during builds, so CI receives Vercel-compatible output while Sites keeps
+  // its native Worker integration locally and in Sites deployments.
+  if (process.env.VERCEL) {
+    const { nitro } = await import("nitro/vite");
+    return {
+      plugins: [
+        vinext(),
+        nitro({ vercel: { functions: { runtime: "nodejs22.x" } } }),
+      ],
+    };
+  }
+
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= "false";

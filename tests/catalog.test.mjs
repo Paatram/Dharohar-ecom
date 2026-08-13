@@ -7,6 +7,8 @@ import {
   products,
   subcategoryContent,
 } from "../lib/catalog.ts";
+import { bundles, bundleProducts, productUse, searchProducts } from "../lib/merchandising.ts";
+import { productFacts, productIsCommerceReady } from "../lib/product-readiness.ts";
 
 test("catalog preserves the supplied launch inventory totals", () => {
   assert.deepEqual(catalogSummary(), {
@@ -58,5 +60,27 @@ test("every product belongs to exactly one category subcategory", () => {
         assert.equal(products.find((product) => product.slug === slug)?.category, category, `${slug}: assigned to the wrong category`);
       }
     }
+  }
+});
+
+test("commerce discovery is complete and typo tolerant", () => {
+  assert.ok(searchProducts("pital kadai").some((product) => product.slug === "peetal-kadai"));
+  assert.ok(searchProducts("copper drinking").every((product) => product.material === "copper"));
+  for (const product of products) assert.ok(productUse(product).length > 0, `${product.slug}: missing use mapping`);
+});
+
+test("curated bundles reference real, unique products", () => {
+  for (const bundle of bundles) {
+    assert.equal(new Set(bundle.productSlugs).size, bundle.productSlugs.length, `${bundle.slug}: duplicate product`);
+    assert.equal(bundleProducts(bundle).length, bundle.productSlugs.length, `${bundle.slug}: missing product`);
+  }
+});
+
+test("commerce activation fails closed while exact-SKU facts are pending", () => {
+  for (const product of products) {
+    assert.equal(productIsCommerceReady(product), false, `${product.slug}: must not activate without evidence`);
+    const facts = productFacts(product);
+    assert.equal(facts.exactImagesApproved, false);
+    assert.equal(facts.stockReconciled, false);
   }
 });

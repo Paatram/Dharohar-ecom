@@ -10,12 +10,13 @@ import {
   type CatalogProduct,
   type ProductCategory,
 } from "@/lib/catalog";
+import { useLabels } from "@/lib/merchandising";
 
 const assurances = [
   ["01", "Made in India", "Objects selected from living metal craft traditions."],
   ["02", "Material clarity", "Care, finish and use explained before you choose."],
   ["03", "Considered delivery", "Every piece inspected and packed for its journey."],
-  ["04", "Lifetime care", "Guidance, restoration and continuity beyond purchase."],
+  ["04", "Care continuity", "Product-specific guidance designed to remain with the object."],
 ] as const;
 
 const categoryProductRows = (Object.keys(categoryContent) as ProductCategory[]).map((slug) => {
@@ -110,6 +111,11 @@ export default function Home() {
           </section>)}
         </section>
 
+        <section className="use-shortcuts shell" aria-labelledby="shop-by-use-title">
+          <div><p className="eyebrow">Shop by use</p><h2 id="shop-by-use-title">Begin with the ritual.</h2></div>
+          <nav aria-label="Shop products by use">{Object.entries(useLabels).map(([slug, label]) => <Link key={slug} href={`/collections/all?use=${slug}`}><span>{label}</span><strong aria-hidden="true">→</strong></Link>)}</nav>
+        </section>
+
         <section className="section shell" id="shop-by-space" aria-labelledby="audience-title">
           <div className="section-heading audience-heading">
             <p className="eyebrow">Enter through your world</p>
@@ -142,9 +148,9 @@ export default function Home() {
               <h2 id="materials-title">Material before marketing.</h2>
               <p className="material-intro">Traditional metals ask for clarity. We explain composition, lining, compatibility, care and the natural changes that come with use—before a piece enters your home.</p>
               <ol>
-                <li><span>01</span><div><h3>Tamra · Copper</h3><p>Responsive, luminous and expressive in the way it develops character.</p></div></li>
-                <li><span>02</span><div><h3>Peetal · Brass</h3><p>Warm, familiar and suited to generous everyday forms.</p></div></li>
-                <li><span>03</span><div><h3>Kansa · Bronze</h3><p>Grounded in tone and weight, with a calm presence at the table.</p></div></li>
+                <li><span>01</span><div><h3>Tamra · Copper</h3><p>Responsive, luminous and expressive in the way it develops character.</p><Link href="/collections/all?material=copper">Shop copper →</Link></div></li>
+                <li><span>02</span><div><h3>Peetal · Brass</h3><p>Warm, familiar and suited to generous everyday forms.</p><Link href="/collections/all?material=brass">Shop peetal →</Link></div></li>
+                <li><span>03</span><div><h3>Kansa · Bronze</h3><p>Grounded in tone and weight, with a calm presence at the table.</p><Link href="/collections/all?material=kansa">Shop kansa →</Link></div></li>
               </ol>
               <Link className="button button-gold" href="/materials">Explore the material library</Link>
             </div>
@@ -159,10 +165,10 @@ export default function Home() {
             <Link className="button button-ghost" href="/shop-for/gifting">Explore gifting</Link>
           </article>
           <article className="service-card service-card-care">
-            <p className="eyebrow">Lifetime craftsmanship care</p>
+            <p className="eyebrow">Craftsmanship care</p>
             <h2>Use it. Care for it. Restore it.</h2>
             <p>Material-specific guidance and a restoration pathway keep meaningful objects in circulation.</p>
-            <Link className="button button-wine" href="/care">Understand lifetime care</Link>
+            <Link className="button button-wine" href="/care">Understand the care plan</Link>
           </article>
         </section>
       </main>

@@ -35,6 +35,8 @@ test("server-renders the Dharohar storefront", async () => {
   assert.match(html, /class="nav-trigger"/);
   assert.doesNotMatch(html, /<details class="nav-menu"/);
   assert.match(html, /aria-controls="mobile-drawer"/);
+  assert.match(text, /Discover/);
+  assert.match(text, /Trade/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
@@ -42,10 +44,13 @@ test("server-renders a launch product with accurate gating", async () => {
   const response = await render("/products/peetal-kadai");
   assert.equal(response.status, 200);
   const html = await response.text();
+  const text = visibleText(html);
   assert.match(html, /Peetal Kadai/);
   assert.match(html, /Register purchase interest/);
   assert.match(html, /data-quality gate/);
   assert.match(html, /application\/ld\+json/);
+  assert.match(text, /Add to selection bag/);
+  assert.match(text, /Check delivery readiness/);
   assert.doesNotMatch(html, /schema.org\/(InStock|LimitedAvailability|PreOrder)/);
 });
 
@@ -63,6 +68,18 @@ for (const [pathname, expected] of [
   ["/privacy", "No customer data collection"],
   ["/terms", "commercial terms are not yet active"],
   ["/contact?product=peetal-kadai", "Interest in Peetal Kadai"],
+  ["/search?q=copper", "Results for"],
+  ["/gifting", "Given once"],
+  ["/trade", "supported like a project"],
+  ["/wishlist", "Saved pieces"],
+  ["/compare", "Compare without guesswork"],
+  ["/cart", "considered group of objects"],
+  ["/account", "Orders, addresses and care"],
+  ["/track-order", "honest order timeline"],
+  ["/checkout-readiness", "Checkout opens"],
+  ["/journal", "Useful knowledge"],
+  ["/journal/choose-a-traditional-tawa", "traditional tawa"],
+  ["/faq", "Questions, answered plainly"],
 ]) {
   test(`server-renders ${pathname}`, async () => {
     const response = await render(pathname);

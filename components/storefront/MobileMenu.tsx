@@ -9,6 +9,7 @@ import {
   subcategoryContent,
   type ProductCategory,
 } from "@/lib/catalog";
+import { materialStories, useLabels } from "@/lib/merchandising";
 
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
@@ -49,6 +50,14 @@ export function MobileMenu() {
             {subcategoryContent[slug as ProductCategory].map((subcategory) => <Link key={subcategory.slug} href={`/collections/${slug}/${subcategory.slug}`} onClick={close}>{subcategory.name}<small>{subcategory.productSlugs.length}</small></Link>)}
           </div>
         </details>)}
+        <p>Shop by metal</p>
+        <div className="mobile-menu-links mobile-space-links">
+          {Object.entries(materialStories).map(([slug, material]) => <Link key={slug} href={`/collections/all?material=${slug}`} onClick={close}>{material.shortName}</Link>)}
+        </div>
+        <p>Shop by use</p>
+        <div className="mobile-menu-links mobile-space-links">
+          {Object.entries(useLabels).map(([slug, label]) => <Link key={slug} href={`/collections/all?use=${slug}`} onClick={close}>{label}</Link>)}
+        </div>
         <p>Popular products</p>
         <div className="mobile-menu-links">
           {featuredProducts.slice(0, 4).map((product) => <Link key={product.slug} href={`/products/${product.slug}`} onClick={close}>{product.name}</Link>)}
@@ -61,7 +70,10 @@ export function MobileMenu() {
           <Link href="/materials" onClick={close}>Materials</Link>
           <Link href="/our-craft" onClick={close}>Our craft</Link>
           <Link href="/care" onClick={close}>Care</Link>
-          <Link href="/contact" onClick={close}>Enquire</Link>
+          <Link href="/gifting" onClick={close}>Gifting</Link>
+          <Link href="/trade" onClick={close}>Trade quote</Link>
+          <Link href="/journal" onClick={close}>Journal</Link>
+          <Link href="/account" onClick={close}>Account</Link>
         </div>
       </nav>
     </aside>
