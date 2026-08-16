@@ -31,6 +31,10 @@ test("server-renders the Dharohar storefront", async () => {
   assert.ok(text.indexOf("Choose for where it belongs") < text.indexOf("Find the right piece"), "space-led shopping must remain directly above catalogue discovery");
   assert.ok(text.indexOf("Find the right piece") < text.indexOf("Made in India"), "catalogue discovery must remain above supporting assurances");
   assert.match(html, /class="hero storefront-hero"|dharohar-hero-tableau/, "the ecommerce homepage must render the requested visual hero");
+  assert.match(html, /aria-roledescription="carousel"/, "the hero must render as an accessible carousel");
+  assert.match(html, /Previous featured collection/);
+  assert.match(html, /Next featured collection/);
+  assert.equal((html.match(/Show slide \d:/g) ?? []).length, 4, "the hero must offer four directly selectable slides");
   assert.doesNotMatch(html, /#b78b3c|#e2c580|226,\s*197,\s*128/i, "legacy gold-brown theme values must not return");
   assert.match(text, /All products 34/);
   assert.match(html, /category-filter-toggles/);

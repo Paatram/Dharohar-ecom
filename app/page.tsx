@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HomeProductExplorer } from "@/components/commerce/HomeProductExplorer";
+import { HeroCarousel } from "@/components/storefront/HeroCarousel";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import {
@@ -21,25 +22,7 @@ export default function Home() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero storefront-hero" aria-labelledby="storefront-hero-title">
-          <Image src="/images/dharohar/brand/dharohar-hero-tableau.webp" alt="A considered Dharohar table setting with brass and copper vessels" fill priority sizes="100vw" />
-          <div className="hero-shade" />
-          <div className="shell storefront-hero-layout">
-            <div className="storefront-hero-content">
-              <p className="eyebrow eyebrow-gold">The Dharohar collection</p>
-              <h1 id="storefront-hero-title">The Heritage Kitchen, <em>Reimagined.</em></h1>
-              <p className="hero-intro">Metalware chosen for how you cook, host, work and gift—presented with the clarity a modern purchase deserves.</p>
-              <div className="hero-actions"><Link className="button button-gold" href="#shop-collection">Shop the collection</Link><Link className="button button-ghost" href="#shop-by-space">Choose by space</Link></div>
-            </div>
-          </div>
-          <nav className="shell hero-shop-finder" aria-label="Quick ways to shop">
-            <Link href="/shop-for/households"><small>Made for</small><strong>Homes & families</strong></Link>
-            <Link href="/shop-for/offices"><small>For work</small><strong>Offices & teams</strong></Link>
-            <Link href="/shop-for/restaurants"><small>For service</small><strong>Restaurants & hotels</strong></Link>
-            <Link href="/shop-for/interior-designers"><small>For projects</small><strong>Designers & gifting</strong></Link>
-            <Link className="hero-shop-finder-go" href="#shop-by-space" aria-label="Explore all spaces"><span aria-hidden="true">→</span></Link>
-          </nav>
-        </section>
+        <HeroCarousel />
 
         <section className="section shell space-priority-section commerce-entry" id="shop-by-space" aria-labelledby="audience-title">
           <div className="space-section-heading">
