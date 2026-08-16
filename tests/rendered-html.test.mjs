@@ -55,18 +55,20 @@ test("server-renders the Dharohar storefront", async () => {
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
-test("server-renders a launch product with accurate gating", async () => {
+test("server-renders a purchase-ready product detail", async () => {
   const response = await render("/products/peetal-kadai");
   assert.equal(response.status, 200);
   const html = await response.text();
   const text = visibleText(html);
   assert.match(html, /Peetal Kadai/);
-  assert.match(html, /Register purchase interest/);
-  assert.match(html, /data-quality gate/);
+  assert.match(html, /ProductGallery/);
+  assert.match(html, /Frequently paired/);
   assert.match(html, /application\/ld\+json/);
-  assert.match(text, /Add to selection bag/);
-  assert.match(text, /Check delivery readiness/);
-  assert.doesNotMatch(html, /schema.org\/(InStock|LimitedAvailability|PreOrder)/);
+  assert.match(text, /Add to bag/);
+  assert.match(text, /Buy now/);
+  assert.match(text, /Check delivery location/);
+  assert.match(text, /Customer reviews/);
+  assert.match(html, /schema.org\/InStock/);
 });
 
 test("server-renders the device-private Care Circle workflow", async () => {
@@ -78,9 +80,9 @@ test("server-renders the device-private Care Circle workflow", async () => {
   assert.match(text, /Care Notes/i);
   assert.match(text, /Care Circle/i);
   assert.match(text, /Collector Care/i);
-  assert.match(text, /No recurring payment is taken today/i);
+  assert.match(text, /Start with complimentary care notes/i);
   assert.match(text, /Save my care plan/i);
-  assert.match(text, /always saved locally/i);
+  assert.match(text, /saved on this device/i);
 });
 
 test("care-plan interest pre-fills the enquiry subject", async () => {
@@ -101,20 +103,19 @@ for (const [pathname, expected] of [
   ["/materials", "Know the metal"],
   ["/our-craft", "Craft should be documented"],
   ["/care", "Use leaves a history"],
-  ["/shipping-returns", "Shipping terms will open"],
-  ["/privacy", "Data is collected only for a clear customer action"],
-  ["/terms", "Commercial terms remain an activation gate"],
-  ["/contact?product=peetal-kadai", "Interest in Peetal Kadai"],
+  ["/shipping-returns", "Delivery information for your order"],
+  ["/privacy", "Data is collected for clear customer actions"],
+  ["/terms", "Terms of using the Dharohar store"],
+  ["/contact?product=peetal-kadai", "Ask about Peetal Kadai"],
   ["/search?q=copper", "Results for"],
   ["/gifting", "Given once"],
   ["/trade", "supported like a project"],
   ["/wishlist", "Saved pieces"],
-  ["/compare", "Compare without guesswork"],
-  ["/cart", "considered group of objects"],
-  ["/account", "Orders, addresses and care"],
-  ["/track-order", "honest order timeline"],
-  ["/checkout-readiness", "Checkout opens"],
-  ["/checkout", "Verify every promise before payment"],
+  ["/compare", "Choose the right piece"],
+  ["/cart", "Review your order"],
+  ["/account", "Sign in or create your Dharohar account"],
+  ["/track-order", "clear order timeline"],
+  ["/checkout", "Complete your order"],
   ["/journal", "Useful knowledge"],
   ["/journal/choose-a-traditional-tawa", "traditional tawa"],
   ["/faq", "Questions, answered plainly"],
@@ -125,6 +126,12 @@ for (const [pathname, expected] of [
     assert.match(visibleText(await response.text()), new RegExp(expected, "i"));
   });
 }
+
+test("legacy checkout-readiness route redirects customers to checkout", async () => {
+  const response = await render("/checkout-readiness");
+  assert.equal(response.status, 307);
+  assert.equal(response.headers.get("location"), "/checkout");
+});
 
 test("returns a real not-found response for an unknown product", async () => {
   const response = await render("/products/not-a-real-product");

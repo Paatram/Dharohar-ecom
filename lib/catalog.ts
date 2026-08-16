@@ -29,6 +29,12 @@ export type CatalogProduct = {
   featured?: boolean;
 };
 
+export type ProductGalleryImage = {
+  src: string;
+  alt: string;
+  label: string;
+};
+
 export type ProductSubcategory = {
   slug: string;
   name: string;
@@ -337,7 +343,7 @@ export const products: CatalogProduct[] = [
     landedCostPaise: 238500,
     sellingPricePaise: 274275,
     launchStock: 2,
-    image: "/images/dharohar/products/copper-tumbler-engraving.jpg",
+    image: "/images/dharohar/gallery/brass-davara.jpg",
     description: "Six restrained peetal glasses composed for family tables, guest service and gifting.",
   },
   {
@@ -350,7 +356,7 @@ export const products: CatalogProduct[] = [
     landedCostPaise: 238500,
     sellingPricePaise: 274275,
     launchStock: 2,
-    image: "/images/dharohar/products/copper-tumbler-engraving.jpg",
+    image: "/images/dharohar/gallery/brass-davara.jpg",
     description: "A six-piece brass glass set with a deeper antique finish for expressive table settings.",
   },
   {
@@ -441,7 +447,7 @@ export const products: CatalogProduct[] = [
     landedCostPaise: 1900000,
     sellingPricePaise: 2185000,
     launchStock: 2,
-    image: "/images/dharohar/products/brass-kadhai-set.webp",
+    image: "/images/dharohar/gallery/dinnerware.webp",
     description: "A complete peetal dining composition for milestone gifting and tables intended to endure.",
     featured: true,
   },
@@ -455,7 +461,7 @@ export const products: CatalogProduct[] = [
     landedCostPaise: 1900000,
     sellingPricePaise: 2185000,
     launchStock: 2,
-    image: "/images/dharohar/products/brass-kadhai-set.webp",
+    image: "/images/dharohar/gallery/dinnerware.webp",
     description: "A complete brass dinner service finished with the dimensional warmth of an antique surface.",
   },
   {
@@ -481,7 +487,7 @@ export const products: CatalogProduct[] = [
     landedCostPaise: 207500,
     sellingPricePaise: 290500,
     launchStock: 2,
-    image: "/images/dharohar/products/brass-kadhai-set.webp",
+    image: "/images/dharohar/gallery/tableware.webp",
     description: "Six polished peetal katoris for coordinated daily dining and generous festive service.",
   },
   {
@@ -494,7 +500,7 @@ export const products: CatalogProduct[] = [
     landedCostPaise: 201000,
     sellingPricePaise: 281400,
     launchStock: 2,
-    image: "/images/dharohar/products/brass-kadhai-set.webp",
+    image: "/images/dharohar/gallery/tableware.webp",
     description: "A six-piece brass katori set with an antique finish for layered table compositions.",
   },
   {
@@ -507,7 +513,7 @@ export const products: CatalogProduct[] = [
     landedCostPaise: 163500,
     sellingPricePaise: 228900,
     launchStock: 2,
-    image: "/images/dharohar/products/brass-kadhai-set.webp",
+    image: "/images/dharohar/gallery/brass-thali-top.png",
     description: "A pair of luminous peetal thalis for intimate dining, gifting and considered hospitality.",
   },
   {
@@ -602,6 +608,82 @@ export function formatInr(paise: number) {
 
 export function findProduct(slug: string) {
   return products.find((product) => product.slug === slug);
+}
+
+export function productGallery(product: CatalogProduct): ProductGalleryImage[] {
+  const cookware = [
+    product.image,
+    "/images/dharohar/gallery/brass-kadhai-angle.png",
+    "/images/dharohar/products/brass-flat-kadhai.webp",
+    "/images/dharohar/categories/cookware.webp",
+  ];
+  const tawas = [
+    product.image,
+    "/images/dharohar/gallery/brass-paraat.jpg",
+    "/images/dharohar/products/brass-flat-kadhai.webp",
+    "/images/dharohar/categories/cookware.webp",
+  ];
+  const patilas = [
+    product.image,
+    "/images/dharohar/products/brass-lagaan.webp",
+    "/images/dharohar/gallery/brass-kadhai-angle.png",
+    "/images/dharohar/categories/cookware.webp",
+  ];
+  const copperBottles = [
+    product.image,
+    "/images/dharohar/gallery/copper-bottle-front.png",
+    "/images/dharohar/products/copper-bottle-lifestyle.jpg",
+    "/images/dharohar/gallery/copper-detail.webp",
+  ];
+  const copperGlasses = [
+    product.image,
+    "/images/dharohar/gallery/copper-tumbler-angle.png",
+    "/images/dharohar/gallery/copper-pair.webp",
+    "/images/dharohar/gallery/copper-detail.webp",
+  ];
+  const peetalGlasses = [
+    product.image,
+    "/images/dharohar/gallery/tableware.webp",
+    "/images/dharohar/gallery/brass-thali-top.png",
+    "/images/dharohar/categories/drinkware-clean.webp",
+  ];
+  const tools = [
+    product.image,
+    product.slug.includes("fork") || product.slug.includes("spoon")
+      ? "/images/dharohar/products/brass-cutlery.jpg"
+      : "/images/dharohar/products/brass-ladles-clean.png",
+    "/images/dharohar/categories/kitchen-utensils.webp",
+    "/images/dharohar/gallery/tableware.webp",
+  ];
+  const kansaSets = [
+    product.image,
+    "/images/dharohar/gallery/kansa.webp",
+    "/images/dharohar/products/kansa-thaali-clean.jpg",
+    "/images/dharohar/gallery/dinnerware.webp",
+  ];
+  const peetalSets = [
+    product.image,
+    "/images/dharohar/gallery/brass-thali-top.png",
+    "/images/dharohar/gallery/tableware.webp",
+    "/images/dharohar/gallery/dinnerware.webp",
+  ];
+
+  let sources = cookware;
+  if (product.slug.includes("tawa")) sources = tawas;
+  else if (product.slug.includes("patila")) sources = patilas;
+  else if (product.category === "drinkware" && product.slug.includes("bottle")) sources = copperBottles;
+  else if (product.category === "drinkware" && product.material === "copper") sources = copperGlasses;
+  else if (product.category === "drinkware") sources = peetalGlasses;
+  else if (product.category === "kitchen-tools") sources = tools;
+  else if (product.category === "kitchen-sets" && product.material === "kansa") sources = kansaSets;
+  else if (product.category === "kitchen-sets") sources = peetalSets;
+
+  const labels = ["Primary view", "Alternate view", "Material detail", "Collection view"];
+  return [...new Set(sources)].slice(0, 4).map((src, index) => ({
+    src,
+    label: labels[index],
+    alt: `${product.name} — ${labels[index].toLowerCase()}`,
+  }));
 }
 
 export function findSubcategory(category: ProductCategory, subcategorySlug: string) {

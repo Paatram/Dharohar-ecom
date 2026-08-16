@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { ContentPage, ContentSection } from "@/components/storefront/ContentPage";
 
-export const metadata: Metadata = { title: "Terms", description: "Terms status for the Dharohar verification storefront.", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Terms", description: "Terms for using the Dharohar online store.", robots: { index: false, follow: false } };
 
 export default function TermsPage() {
-  return <ContentPage eyebrow="Terms" title="Commercial terms remain an activation gate." introduction="The secure order workflow is implemented but cannot accept payment until every SKU and provider passes verification. Indicative catalogue prices and planned stock do not yet form an offer to sell.">
-    <ContentSection title="Production terms gate"><p>Before orders open, Dharohar must approve and publish seller identity, pricing and tax treatment, order acceptance and cancellation, payment, shipping, inspection, returns, warranty, personalised work, B2B orders, liability, grievance contact and dispute handling.</p></ContentSection>
-    <ContentSection title="Order integrity"><p>Payable totals, availability and delivery serviceability are calculated by the server. A customer-side amount is never trusted. Payment is confirmed only by a signature-verified, idempotently processed provider webhook.</p></ContentSection>
-    <ContentSection title="Product information"><p>Natural variation will be explained clearly, but it will never be used to excuse a material mismatch, unsafe construction or failure to meet the published specification.</p></ContentSection>
+  return <ContentPage eyebrow="Terms" title="Terms of using the Dharohar store." introduction="These terms apply when you browse, create an account, submit an enquiry or place an order through Dharohar.">
+    <ContentSection title="Orders and payment"><p>Your order summary shows products, GST, delivery charge and total before payment. An order is accepted after payment is confirmed and an order confirmation is issued. If an item becomes unavailable before confirmation, no charge is completed for that order.</p></ContentSection>
+    <ContentSection title="Product information"><p>We aim to present product names, materials, finishes and prices accurately. Hand-finished metalware may show natural tonal or surface variation. Images may appear slightly different across screens.</p></ContentSection>
+    <ContentSection title="Accounts and acceptable use"><p>You are responsible for the delivery and contact information supplied with an order. Do not misuse the service, interfere with checkout, or submit unlawful or misleading content.</p></ContentSection>
+    <ContentSection title="Support"><p>Questions about an order, product or these terms can be submitted through the contact page with the relevant order or product reference.</p></ContentSection>
   </ContentPage>;
 }

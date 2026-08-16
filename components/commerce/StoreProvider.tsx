@@ -40,7 +40,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const timer = window.setTimeout(() => {
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) ?? "{}") as Partial<Pick<StoreState, "cart" | "wishlist" | "compare" | "giftWrap" | "giftMessage">>;
-        if (Array.isArray(saved.cart)) setCart(saved.cart.filter((line) => typeof line?.slug === "string" && Number.isInteger(line.quantity) && line.quantity > 0));
+        const storedCart = Array.isArray(saved.cart) ? saved.cart.filter((line) => typeof line?.slug === "string" && Number.isInteger(line.quantity) && line.quantity > 0) : [];
+        const buyNowSlug = window.sessionStorage.getItem("dharohar-buy-now-slug");
+        const nextCart = buyNowSlug ? (storedCart.some((line) => line.slug === buyNowSlug) ? storedCart.map((line) => line.slug === buyNowSlug ? { ...line, quantity: Math.min(20, line.quantity + 1) } : line) : [...storedCart, { slug: buyNowSlug, quantity: 1 }]) : storedCart;
+        if (buyNowSlug) window.sessionStorage.removeItem("dharohar-buy-now-slug");
+        setCart(nextCart);
         if (Array.isArray(saved.wishlist)) setWishlist(saved.wishlist.filter((slug): slug is string => typeof slug === "string"));
         if (Array.isArray(saved.compare)) setCompare(saved.compare.filter((slug): slug is string => typeof slug === "string").slice(0, 3));
         if (typeof saved.giftWrap === "boolean") setGiftWrap(saved.giftWrap);

@@ -5,6 +5,8 @@ import { CommerceError } from "@/lib/commerce/http";
 import { quoteShipping } from "@/lib/commerce/providers/shiprocket";
 import { missingProductFacts } from "@/lib/commerce/readiness";
 
+const GST_BASIS_POINTS = 500;
+
 export async function buildVerifiedQuote(db: D1Database, input: z.infer<typeof quoteSchema>) {
   await ensureCatalogSeeded(db);
   const rows = await readProducts(db, input.items.map((item) => item.slug));
@@ -28,14 +30,12 @@ export async function buildVerifiedQuote(db: D1Database, input: z.infer<typeof q
   for (const item of input.items) {
     const product = rowMap.get(item.slug)!;
     const line = product.indicative_price_paise * item.quantity;
-    const rate = product.gst_basis_points!;
-    const lineTax = product.price_includes_tax ? Math.round((line * rate) / (10_000 + rate)) : Math.round((line * rate) / 10_000);
+    const lineTax = Math.round((line * GST_BASIS_POINTS) / 10_000);
     taxPaise += lineTax;
-    subtotalPaise += product.price_includes_tax ? line - lineTax : line;
+    subtotalPaise += line;
     weightGrams += product.packed_weight_grams! * item.quantity;
   }
   const shipping = await quoteShipping({ pincode: input.pincode, weightGrams, declaredValuePaise: subtotalPaise + taxPaise });
   const totalPaise = subtotalPaise + taxPaise + shipping.shippingPaise;
   return { rows, rowMap, shipping, quote: { currency: "INR", subtotalPaise, discountPaise: 0, taxPaise, shippingPaise: shipping.shippingPaise, totalPaise } };
 }
-

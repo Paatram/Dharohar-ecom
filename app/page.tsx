@@ -73,7 +73,7 @@ export default function Home() {
         </section>
 
         <section className="care-home-feature" aria-labelledby="care-home-title">
-          <div className="shell care-home-layout"><div><p className="eyebrow eyebrow-gold">Dharohar Care Circle</p><h2 id="care-home-title">The relationship should not end at purchase.</h2><p>Compare care subscription paths, build a private care rhythm, and enter a future restoration pathway with clear assessment standards.</p></div><div className="care-home-points"><span>01 <strong>Choose the right care plan</strong></span><span>02 <strong>Save a care rhythm on this device</strong></span><span>03 <strong>Prepare for verified restoration support</strong></span><Link className="button button-gold" href="/care#plans">View care plans</Link></div></div>
+          <div className="shell care-home-layout"><div><p className="eyebrow eyebrow-gold">Dharohar Care Circle</p><h2 id="care-home-title">The relationship should not end at purchase.</h2><p>Build a practical care rhythm and get support for the copper, peetal and kansa pieces you live with.</p></div><div className="care-home-points"><span>01 <strong>Choose the right care path</strong></span><span>02 <strong>Save a care rhythm on this device</strong></span><span>03 <strong>Ask for collection-level support</strong></span><Link className="button button-gold" href="/care#plans">View care options</Link></div></div>
         </section>
 
         <section className="section shell service-grid service-grid-secondary" aria-label="Dharohar services">

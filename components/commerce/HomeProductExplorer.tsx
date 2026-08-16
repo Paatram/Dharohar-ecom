@@ -73,7 +73,7 @@ export function HomeProductExplorer({ initialProducts }: { initialProducts: Cata
 
     <div className={`home-catalog-layout ${filtersOpen ? "filters-open" : ""}`}>
       <aside className="home-filter-panel" id="home-filter-panel" aria-label="Product filters">
-        <div className="home-filter-heading"><div><p className="eyebrow">Refine</p><h2>Filters</h2></div>{activeFilterCount > 0 && <button type="button" onClick={reset}>Clear all</button>}</div>
+        <div className="home-filter-heading"><h2>Filters</h2>{activeFilterCount > 0 && <button type="button" onClick={reset}>Clear all</button>}</div>
         <fieldset><legend>Price</legend>{budgets.map((item) => <label key={item.value}><input type="radio" name="home-budget" checked={budget === item.value} onChange={() => setBudget(item.value)} /><span>{item.label}</span></label>)}</fieldset>
         <fieldset><legend>Metal</legend>{(["all", "brass", "copper", "kansa", "mixed"] as const).map((value) => <label key={value}><input type="radio" name="home-material" checked={material === value} onChange={() => setMaterial(value)} /><span>{value === "all" ? "All metals" : materialLabels[value]}</span></label>)}</fieldset>
         <fieldset><legend>Use</legend>{(["all", "cooking", "drinking", "dining", "serving"] as const).map((value) => <label key={value}><input type="radio" name="home-use" checked={use === value} onChange={() => setUse(value)} /><span>{value === "all" ? "All uses" : useLabels[value]}</span></label>)}</fieldset>

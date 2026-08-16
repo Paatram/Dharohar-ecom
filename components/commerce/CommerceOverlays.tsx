@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Heart, Scale, Search, ShoppingBag, X } from "lucide-react";
+import { Heart, Scale, Search, ShoppingBag, UserRound, X } from "lucide-react";
 import { findProduct, formatInr, products } from "@/lib/catalog";
 import { materialLabels, searchProducts } from "@/lib/merchandising";
 import { useStore } from "./StoreProvider";
@@ -15,6 +15,7 @@ export function HeaderCommerceActions() {
     <button className="header-icon-action" type="button" onClick={() => setSearchOpen(true)} aria-label="Search Dharohar"><Search size={19} strokeWidth={1.7} aria-hidden="true" /><span className="action-tooltip">Search</span></button>
     <Link className={`header-icon-action header-heart ${wishlist.length ? "has-items" : ""}`} href="/wishlist" aria-label={`Wishlist with ${wishlist.length} items`}><Heart size={19} strokeWidth={1.7} fill={wishlist.length ? "currentColor" : "none"} aria-hidden="true" />{wishlist.length ? <span className="action-count">{wishlist.length}</span> : null}<span className="action-tooltip">Wishlist</span></Link>
     <Link className="header-icon-action" href="/compare" aria-label={`Compare ${compare.length} items`}><Scale size={19} strokeWidth={1.7} aria-hidden="true" />{compare.length ? <span className="action-count">{compare.length}</span> : null}<span className="action-tooltip">Compare</span></Link>
+    <Link className="header-icon-action" href="/account" aria-label="Your account"><UserRound size={19} strokeWidth={1.7} aria-hidden="true" /><span className="action-tooltip">Account</span></Link>
     <button className="header-icon-action" type="button" onClick={() => setCartOpen(true)} aria-label={`Open selection bag with ${cartCount} items`}><ShoppingBag size={19} strokeWidth={1.7} aria-hidden="true" />{cartCount ? <span className="action-count">{cartCount}</span> : null}<span className="action-tooltip">Bag</span></button>
   </div>;
 }
@@ -55,9 +56,10 @@ function SearchDialog() {
 }
 
 function CartDrawer() {
-  const { cart, cartOpen, giftWrap, giftMessage, setCartOpen, setQuantity, removeFromCart, setGiftWrap, setGiftMessage } = useStore();
+  const { cart, cartOpen, setCartOpen, setQuantity, removeFromCart } = useStore();
   const lines = cart.map((line) => ({ ...line, product: findProduct(line.slug) })).filter((line): line is typeof line & { product: NonNullable<typeof line.product> } => Boolean(line.product));
   const subtotal = lines.reduce((sum, line) => sum + line.product.sellingPricePaise * line.quantity, 0);
+  const tax = Math.round(subtotal * .05);
   useEffect(() => {
     if (!cartOpen) return;
     const close = (event: KeyboardEvent) => { if (event.key === "Escape") setCartOpen(false); };
@@ -69,19 +71,17 @@ function CartDrawer() {
     <button className="overlay-scrim" type="button" aria-label="Close bag" onClick={() => setCartOpen(false)} />
     <aside className="cart-drawer" aria-label="Selection bag">
       <header><div><p className="eyebrow">Your selection</p><h2>Bag</h2></div><button type="button" onClick={() => setCartOpen(false)} aria-label="Close bag"><X size={19} aria-hidden="true" /></button></header>
-      <div className="cart-readiness"><strong>Preview mode</strong><p>Your selection is saved on this device. Payment opens only after the catalogue and fulfilment launch gates pass.</p></div>
       <div className="cart-lines">
         {lines.map(({ product, quantity }) => <article key={product.slug}><Image src={product.image} alt="" width={92} height={108} /><div><Link href={`/products/${product.slug}`} onClick={() => setCartOpen(false)}>{product.name}</Link><small>{product.finish} · {formatInr(product.sellingPricePaise)}</small><div className="quantity-control"><button type="button" onClick={() => setQuantity(product.slug, quantity - 1)} aria-label={`Decrease ${product.name} quantity`}>−</button><span>{quantity}</span><button type="button" onClick={() => setQuantity(product.slug, quantity + 1)} aria-label={`Increase ${product.name} quantity`}>+</button><button type="button" onClick={() => removeFromCart(product.slug)}>Remove</button></div></div></article>)}
         {!lines.length ? <div className="empty-state"><strong>Your bag is waiting.</strong><p>Save a considered group of pieces while you explore.</p><Link href="/collections/all" onClick={() => setCartOpen(false)}>Explore the collection</Link></div> : null}
       </div>
       {lines.length ? <footer>
-        <label className="gift-toggle"><input type="checkbox" checked={giftWrap} onChange={(event) => setGiftWrap(event.target.checked)} /><span>Add gift presentation and a message <small>Your choice is saved with this bag on this device.</small></span></label>
-        {giftWrap ? <label className="gift-message">Gift message<textarea value={giftMessage} maxLength={240} rows={3} onChange={(event) => setGiftMessage(event.target.value)} placeholder="Write a message for the recipient" /><small>{giftMessage.length}/240 · Presentation availability and price are confirmed before launch.</small></label> : null}
-        <div className="cart-total"><span>Indicative product total</span><strong>{formatInr(subtotal)}</strong></div>
-        <p>GST treatment, delivery fees and serviceability are not yet confirmed and are therefore excluded.</p>
+        <div className="cart-total"><span>Products</span><strong>{formatInr(subtotal)}</strong></div>
+        <div className="cart-total cart-tax"><span>GST (5%)</span><strong>{formatInr(tax)}</strong></div>
+        <div className="cart-total cart-grand-total"><span>Before delivery</span><strong>{formatInr(subtotal + tax)}</strong></div>
+        <p>Delivery is calculated from your address at checkout.</p>
         <Link className="button button-wine" href="/checkout" onClick={() => setCartOpen(false)}>Secure checkout</Link>
         <Link className="cart-enquire" href="/cart" onClick={() => setCartOpen(false)}>View full selection bag</Link>
-        <Link className="cart-enquire" href="/contact" onClick={() => setCartOpen(false)}>Enquire about this selection</Link>
       </footer> : null}
     </aside>
   </div>;

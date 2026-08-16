@@ -33,7 +33,7 @@ export default async function CollectionPage({ params, searchParams }: Collectio
 
   const collectionProducts = isAll ? products : products.filter((product) => product.category === slug);
   const title = category?.name ?? "All Objects";
-  const description = category?.description ?? "The complete opening collection: useful objects in copper, peetal and kansa for kitchens, tables, spaces and gifts.";
+  const description = category?.description ?? "Useful objects in copper, peetal and kansa for kitchens, tables, spaces and gifts.";
   const image = category?.image ?? "/images/dharohar/brand/dharohar-hero-tableau.webp";
   const itemListSchema = { "@context": "https://schema.org", "@type": "ItemList", name: title, numberOfItems: collectionProducts.length, itemListElement: collectionProducts.map((product, index) => ({ "@type": "ListItem", position: index + 1, url: absoluteUrl(`/products/${product.slug}`), name: product.name })) };
 
@@ -46,7 +46,7 @@ export default async function CollectionPage({ params, searchParams }: Collectio
           <Image src={image} alt="" fill priority sizes="100vw" />
           <div className="image-shade" />
           <div className="shell">
-            <p className="eyebrow eyebrow-gold">The opening collection</p>
+            <p className="eyebrow eyebrow-gold">The Dharohar collection</p>
             <h1>{title}</h1>
             <p>{description}</p>
           </div>

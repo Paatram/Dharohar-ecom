@@ -48,9 +48,8 @@ export async function POST(request: Request) {
     ];
     for (const item of input.items) {
       const product = verified.rowMap.get(item.slug)!;
-      const rate = product.gst_basis_points!;
       const line = product.indicative_price_paise * item.quantity;
-      const lineTax = product.price_includes_tax ? Math.round((line * rate) / (10_000 + rate)) : Math.round((line * rate) / 10_000);
+      const lineTax = Math.round((line * 500) / 10_000);
       statements.push(db.prepare("INSERT INTO order_items (id, order_id, product_slug, product_name, unit_price_paise, tax_paise, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)")
         .bind(crypto.randomUUID(), orderId, product.slug, product.name, product.indicative_price_paise, lineTax, item.quantity));
     }

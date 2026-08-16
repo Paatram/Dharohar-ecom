@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import { Heart, MapPin, Scale, ShoppingBag } from "lucide-react";
+import { Heart, MapPin, Scale, ShoppingBag, Zap } from "lucide-react";
 import { useStore } from "./StoreProvider";
 
 export function ProductCardActions({ slug }: { slug: string }) {
@@ -16,23 +15,36 @@ export function ProductCardActions({ slug }: { slug: string }) {
 }
 
 export function ProductPurchaseActions({ slug }: { slug: string }) {
-  const { addToCart, wishlist, compare, toggleWishlist, toggleCompare } = useStore();
+  const { addToCart, setCartOpen, wishlist, compare, toggleWishlist, toggleCompare } = useStore();
   const [added, setAdded] = useState(false);
   const add = () => { addToCart(slug); setAdded(true); window.setTimeout(() => setAdded(false), 900); };
   const saved = wishlist.includes(slug);
   const compared = compare.includes(slug);
   return <div className="purchase-actions">
-    <button className={`button button-wine product-cta ${added ? "added" : ""}`} type="button" onClick={add}><ShoppingBag size={17} aria-hidden="true" />{added ? "Added to bag" : "Add to selection bag"}</button>
+    <div className="primary-purchase-actions">
+      <button className={`button button-outline product-cta ${added ? "added" : ""}`} type="button" onClick={add}><ShoppingBag size={17} aria-hidden="true" />{added ? "Added to bag" : "Add to bag"}</button>
+      <button className="button button-wine product-cta" type="button" onClick={() => { window.sessionStorage.setItem("dharohar-buy-now-slug", slug); setCartOpen(false); window.location.assign("/checkout"); }}><Zap size={17} aria-hidden="true" />Buy now</button>
+    </div>
     <div><button className={saved ? "active" : ""} type="button" onClick={() => toggleWishlist(slug)}><Heart size={16} fill={saved ? "currentColor" : "none"} aria-hidden="true" />{saved ? "Saved" : "Save for later"}</button><button className={compared ? "active" : ""} type="button" onClick={() => toggleCompare(slug)}><Scale size={16} aria-hidden="true" />{compared ? "Comparing" : "Compare"}</button></div>
-    <Link href={`/contact?product=${slug}`}>Register purchase interest</Link>
   </div>;
 }
 
 export function DeliveryChecker() {
   const [value, setValue] = useStateSafe("");
   const [message, setMessage] = useStateSafe("");
-  return <form className="delivery-checker" onSubmit={(event) => { event.preventDefault(); setMessage(/^\d{6}$/.test(value) ? "Pincode recorded for preview. Live serviceability and delivery dates activate with the shipping connection." : "Enter a valid 6-digit Indian pincode."); }}>
-    <label htmlFor="delivery-pincode"><MapPin size={15} aria-hidden="true" /> Check delivery readiness</label><div><input id="delivery-pincode" inputMode="numeric" maxLength={6} value={value} onChange={(event) => setValue(event.target.value.replace(/\D/g, ""))} placeholder="6-digit pincode" /><button type="submit">Check</button></div>{message ? <p role="status">{message}</p> : null}
+  const [loading, setLoading] = useState(false);
+  return <form className="delivery-checker" onSubmit={async (event) => {
+    event.preventDefault();
+    if (!/^\d{6}$/.test(value)) { setMessage("Enter a valid 6-digit Indian pincode."); return; }
+    setLoading(true); setMessage("Finding your location…");
+    try {
+      const response = await fetch(`/api/commerce/postcode?pincode=${value}`);
+      const result = await response.json() as { city?: string; state?: string; message?: string };
+      setMessage(response.ok && result.city && result.state ? `${result.city}, ${result.state} selected. Delivery options will be confirmed at checkout.` : result.message ?? "We could not find that pincode. You can enter the address at checkout.");
+    } catch { setMessage("We could not look up that pincode. You can enter the address at checkout."); }
+    finally { setLoading(false); }
+  }}>
+    <label htmlFor="delivery-pincode"><MapPin size={15} aria-hidden="true" /> Check delivery location</label><div><input id="delivery-pincode" inputMode="numeric" maxLength={6} value={value} onChange={(event) => setValue(event.target.value.replace(/\D/g, ""))} placeholder="6-digit pincode" /><button disabled={loading} type="submit">{loading ? "Checking" : "Check"}</button></div>{message ? <p role="status">{message}</p> : null}
   </form>;
 }
 

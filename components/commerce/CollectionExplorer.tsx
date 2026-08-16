@@ -12,7 +12,7 @@ export function CollectionExplorer({ initialProducts, initialMaterial, initialUs
   const validUse = ["cooking", "drinking", "dining", "serving"].includes(initialUse ?? "") ? initialUse as ProductUse : "all";
   const [material, setMaterial] = useState<Material | "all">(validMaterial);
   const [use, setUse] = useState<ProductUse | "all">(validUse);
-  const [availability, setAvailability] = useState<"all" | "planned">("all");
+  const [availability, setAvailability] = useState<"all" | "available">("all");
   const [sort, setSort] = useState<Sort>("featured");
   const [price, setPrice] = useState(4000000);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -36,7 +36,7 @@ export function CollectionExplorer({ initialProducts, initialMaterial, initialUs
         <div><h2>Material</h2>{(["all", "brass", "copper", "kansa", "mixed"] as const).map((value) => <label key={value}><input type="radio" name="material" checked={material === value} onChange={() => setMaterial(value)} /><span>{value === "all" ? "All metals" : materialLabels[value]}</span></label>)}</div>
         <div><h2>Use</h2>{(["all", "cooking", "drinking", "dining", "serving"] as const).map((value) => <label key={value}><input type="radio" name="use" checked={use === value} onChange={() => setUse(value)} /><span>{value === "all" ? "All uses" : useLabels[value]}</span></label>)}</div>
         <div><h2>Price up to</h2><input aria-label="Maximum price" type="range" min={50000} max={4000000} step={50000} value={price} onChange={(event) => setPrice(Number(event.target.value))} /><p>{formatInr(price)}</p></div>
-        <div><h2>Availability</h2><label><input type="checkbox" checked={availability === "planned"} onChange={(event) => setAvailability(event.target.checked ? "planned" : "all")} /><span>Launch stock planned</span></label></div>
+        <div><h2>Availability</h2><label><input type="checkbox" checked={availability === "available"} onChange={(event) => setAvailability(event.target.checked ? "available" : "all")} /><span>In stock</span></label></div>
         <button type="button" className="filter-reset" onClick={reset}>Reset all filters</button>
       </aside>
       <section aria-live="polite" aria-label="Filtered products">

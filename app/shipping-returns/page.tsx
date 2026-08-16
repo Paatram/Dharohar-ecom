@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { ContentPage, ContentSection } from "@/components/storefront/ContentPage";
 
-export const metadata: Metadata = { title: "Shipping & Returns", description: "The launch-stage status of Dharohar shipping, inspection, damage and return policies.", robots: { index: false, follow: true } };
+export const metadata: Metadata = { title: "Shipping & Returns", description: "Delivery and return support for Dharohar orders.", robots: { index: false, follow: true } };
 
 export default function ShippingReturnsPage() {
-  return <ContentPage eyebrow="Policy readiness" title="Shipping terms will open with purchasing—not before." introduction="Rates and timelines depend on verified packed weight, dimensions, serviceable postcodes and carrier contracts. Those inputs are not yet complete, so no unsupported delivery promise is shown.">
-    <ContentSection title="Before orders open"><p>Each SKU must pass packaging trials, volumetric-weight capture, dispatch inspection and serviceability checks. High-value and fragile sets require an explicit damage-evidence process.</p></ContentSection>
-    <ContentSection title="Returns policy gate"><p>The final policy must state the return window, eligible condition, non-returnable personalised items, reverse logistics, refund timing and who bears each shipping cost.</p></ContentSection>
-    <aside className="content-notice"><strong>Current status</strong><p>The checkout review is available, but every unverified SKU or unconfigured provider is blocked before an order or payment can start.</p></aside>
+  return <ContentPage eyebrow="Shipping & returns" title="Delivery information for your order." introduction="Delivery options and charges are calculated from your pincode and shown in checkout before payment.">
+    <ContentSection title="Delivery"><p>Use a complete address and reachable phone number. Once your order is dispatched, tracking information appears against the order and can also be checked with the order number and email.</p></ContentSection>
+    <ContentSection title="Order issues"><p>If an item arrives damaged or does not match your order, contact Dharohar promptly with the order number and clear photographs of the item and packaging so the team can review it.</p></ContentSection>
+    <ContentSection title="Return requests"><p>Start a return request from your account or contact us with the order number. Eligibility, collection method and any applicable cost follow the terms shown with that order.</p></ContentSection>
   </ContentPage>;
 }

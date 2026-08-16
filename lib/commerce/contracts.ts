@@ -58,7 +58,7 @@ export const returnSchema = z.object({
 });
 
 export const reviewSchema = z.object({
-  orderItemId: z.string().uuid(),
+  productSlug: z.string().trim().min(1).max(120),
   rating: z.number().int().min(1).max(5),
   title: z.string().trim().min(3).max(100),
   body: z.string().trim().min(20).max(1200),

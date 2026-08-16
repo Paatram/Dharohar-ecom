@@ -1,7 +1,7 @@
 "use client";
 
 import { FileDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 const serviceLabels: Record<string, string> = {
   hospitality: "Hotels & hospitality",
@@ -42,7 +42,6 @@ export function BriefForm({ initialService = "hospitality" }: { initialService?:
   const [quantity, setQuantity] = useState("");
   const [date, setDate] = useState("");
   const [stored, setStored] = useState(false);
-  const readiness = useMemo(() => quantity && date ? "The quantity and required date are ready for feasibility review." : "Add quantity and date so fulfilment feasibility can be assessed.", [quantity, date]);
   return <form className="brief-form" onSubmit={async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -67,14 +66,13 @@ export function BriefForm({ initialService = "hospitality" }: { initialService?:
       <label>Approximate quantity<input name="quantity" type="number" min="1" value={quantity} onChange={(event) => setQuantity(event.target.value)} required /></label>
       <label>Required by<input name="requiredDate" type="date" value={date} onChange={(event) => setDate(event.target.value)} required /></label>
       <label>Delivery city / pincode<input name="destination" required /></label>
-      <label>Indicative budget<select name="budget"><option>To be discussed</option><option>Under ₹50,000</option><option>₹50,000–₹2,00,000</option><option>₹2,00,000–₹5,00,000</option><option>Above ₹5,00,000</option></select></label>
+      <label>Budget range<select name="budget"><option>To be discussed</option><option>Under ₹50,000</option><option>₹50,000–₹2,00,000</option><option>₹2,00,000–₹5,00,000</option><option>Above ₹5,00,000</option></select></label>
     </div>
     <label>Products, finish, presentation or customisation brief<textarea name="brief" rows={6} placeholder="Tell us what is being sourced, how it will be used, and any packaging or engraving requirements." required /></label>
-    <label>Reference filename or shared-drive link<input name="reference" placeholder="Uploads activate with secure lead storage" /></label>
-    <p className="form-readiness">{readiness}</p>
+    <label>Reference link (optional)<input name="reference" placeholder="Paste a shared moodboard or reference link" /></label>
     <label className="consent-field"><input type="checkbox" required /><span>I consent to Dharohar storing this brief to respond to my project enquiry, subject to the Privacy Notice.</span></label>
     <button className="button button-wine" type="submit">Submit project brief</button>
-    {ready ? <div className="form-success" role="status"><strong>{stored ? "Brief received" : "Secure storage unavailable"} · {reference}</strong><p>{stored ? "Your brief is stored in Dharohar’s private operations ledger. Notification delivery remains subject to the configured business channel." : "Your data was not stored. Download the local draft and try again later."}</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download brief</button></div> : null}
+    {ready ? <div className="form-success" role="status"><strong>{stored ? "Brief received" : "Brief could not be submitted"} · {reference}</strong><p>{stored ? "Thank you. Keep this reference for your conversation with Dharohar." : "Download your draft and try again later."}</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download brief</button></div> : null}
   </form>;
 }
 
@@ -94,6 +92,6 @@ export function ContactForm({ subject }: { subject?: string }) {
     <label>Question or enquiry<textarea name="message" rows={6} required /></label>
     <label className="consent-field"><input type="checkbox" required /><span>I consent to Dharohar storing this enquiry to respond, subject to the Privacy Notice.</span></label>
     <button className="button button-wine" type="submit">Submit enquiry</button>
-    {complete ? <div className="form-success" role="status"><strong>{stored ? "Enquiry received" : "Secure storage unavailable"} · {reference}</strong><p>{stored ? "Your enquiry is stored in Dharohar’s private operations ledger." : "Your data was not stored. Download the local draft and try again later."}</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download enquiry</button></div> : null}
+    {complete ? <div className="form-success" role="status"><strong>{stored ? "Enquiry received" : "Enquiry could not be submitted"} · {reference}</strong><p>{stored ? "Thank you. Keep this reference if you need to follow up." : "Download your draft and try again later."}</p><button className="button button-outline draft-download" type="button" onClick={() => downloadDraft(`${reference}.txt`, draft)}><FileDown size={16} aria-hidden="true" /> Download enquiry</button></div> : null}
   </form>;
 }
