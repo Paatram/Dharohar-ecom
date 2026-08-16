@@ -5,7 +5,6 @@ import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import {
   audienceContent,
-  categoryContent,
   products,
 } from "@/lib/catalog";
 import { useLabels } from "@/lib/merchandising";
@@ -22,44 +21,50 @@ export default function Home() {
     <>
       <SiteHeader />
       <main>
+        <section className="hero storefront-hero" aria-labelledby="storefront-hero-title">
+          <Image src="/images/dharohar/brand/dharohar-hero-tableau.webp" alt="A considered Dharohar table setting with brass and copper vessels" fill priority sizes="100vw" />
+          <div className="hero-shade" />
+          <div className="shell storefront-hero-layout">
+            <div className="storefront-hero-content">
+              <p className="eyebrow eyebrow-gold">The Dharohar collection</p>
+              <h1 id="storefront-hero-title">The Heritage Kitchen, <em>Reimagined.</em></h1>
+              <p className="hero-intro">Metalware chosen for how you cook, host, work and gift—presented with the clarity a modern purchase deserves.</p>
+              <div className="hero-actions"><Link className="button button-gold" href="#shop-collection">Shop the collection</Link><Link className="button button-ghost" href="#shop-by-space">Choose by space</Link></div>
+            </div>
+          </div>
+          <nav className="shell hero-shop-finder" aria-label="Quick ways to shop">
+            <Link href="/shop-for/households"><small>Made for</small><strong>Homes & families</strong></Link>
+            <Link href="/shop-for/offices"><small>For work</small><strong>Offices & teams</strong></Link>
+            <Link href="/shop-for/restaurants"><small>For service</small><strong>Restaurants & hotels</strong></Link>
+            <Link href="/shop-for/interior-designers"><small>For projects</small><strong>Designers & gifting</strong></Link>
+            <Link className="hero-shop-finder-go" href="#shop-by-space" aria-label="Explore all spaces"><span aria-hidden="true">→</span></Link>
+          </nav>
+        </section>
+
         <section className="section shell space-priority-section commerce-entry" id="shop-by-space" aria-labelledby="audience-title">
-          <div className="section-heading audience-heading commerce-entry-heading">
+          <div className="space-section-heading">
             <div>
               <p className="eyebrow">Shop by space</p>
-              <h1 id="audience-title">Choose for where it belongs.</h1>
+              <h2 id="audience-title">Choose for where it belongs.</h2>
             </div>
-            <div><p>Start with the setting—from a family kitchen to hospitality, workplace, design project or meaningful gift.</p><Link className="text-link" href="/collections/all">Browse all 34 products <span aria-hidden="true">→</span></Link></div>
+            <div><p>Start with the setting—from a family kitchen to hospitality, workplace, design project or meaningful gift.</p><Link className="text-link" href="#shop-collection">Browse all 34 products <span aria-hidden="true">→</span></Link></div>
           </div>
-          <div className="audience-grid">
-            {Object.entries(audienceContent).map(([slug, audience]) => <Link className="audience-card" href={`/shop-for/${slug}`} key={slug}>
+          <nav className="space-quick-links" aria-label="Space shortcuts"><a href="#space-cards">All spaces</a><Link href="/shop-for/households">Everyday living</Link><Link href="/shop-for/hotels">Hospitality</Link><Link href="/trade">Projects & gifting</Link></nav>
+          <div className="space-card-grid" id="space-cards">
+            {Object.entries(audienceContent).map(([slug, audience]) => <Link className="space-card" href={`/shop-for/${slug}`} key={slug}>
               <Image src={audience.image} alt="" fill sizes="(max-width: 760px) 100vw, 50vw" /><div className="image-shade" />
-              <div><small>{audience.eyebrow}</small><h3>{audience.name}</h3><p>{audience.description}</p><strong>Explore <span aria-hidden="true">→</span></strong></div>
+              <div><small>{audience.eyebrow}</small><h3>{audience.name}</h3><p>{products.filter((product) => product.audiences.includes(slug as keyof typeof audienceContent)).length} suitable pieces</p><strong>Explore <span aria-hidden="true">→</span></strong></div>
             </Link>)}
           </div>
         </section>
 
-        <section className="section shell category-first product-category-entry" aria-labelledby="category-title">
-          <div className="section-heading split-heading">
-            <div>
-              <p className="eyebrow">Shop by product</p>
-              <h2 id="category-title">Shop the collection.</h2>
-            </div>
-            <p>Four clear families make it easy to begin with one useful piece or compose a complete material story.</p>
-          </div>
-          <div className="category-grid">
-            {Object.entries(categoryContent).map(([slug, category], index) => (
-              <Link className={`category-card category-card-${index + 1}`} href={`/collections/${slug}`} key={slug}>
-                <Image src={category.image} alt="" fill sizes="(max-width: 760px) 100vw, 50vw" />
-                <div className="image-shade" />
-                <span>0{index + 1}</span>
-                <div>
-                  <h3>{category.name}</h3>
-                  <p>{category.description}</p>
-                  <strong>Explore collection <span aria-hidden="true">↗</span></strong>
-                </div>
-              </Link>
-            ))}
-          </div>
+        <section className="category-product-sections home-shop-section" id="shop-collection" aria-labelledby="shop-category-title">
+          <header className="section shell category-sales-heading">
+            <p className="eyebrow">Shop Dharohar</p>
+            <h2 id="shop-category-title">Find the right piece.</h2>
+            <p>Filter the complete collection by product family, price, metal, use, finish or the space you are selecting for.</p>
+          </header>
+          <div className="shell"><HomeProductExplorer initialProducts={products} /></div>
         </section>
 
         <section className="assurance-strip" aria-label="Dharohar assurances">
@@ -71,15 +76,6 @@ export default function Home() {
               </article>
             ))}
           </div>
-        </section>
-
-        <section className="category-product-sections" aria-labelledby="shop-category-title">
-          <header className="section shell category-sales-heading">
-            <p className="eyebrow">Explore the opening collection</p>
-            <h2 id="shop-category-title">Every piece, one place.</h2>
-            <p>See the complete collection together, then use the category toggles to narrow it without leaving the page.</p>
-          </header>
-          <div className="shell"><HomeProductExplorer initialProducts={products} /></div>
         </section>
 
         <section className="use-shortcuts shell" aria-labelledby="shop-by-use-title">
