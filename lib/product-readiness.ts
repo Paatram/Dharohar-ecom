@@ -37,7 +37,12 @@ const pendingFacts: VerifiedProductFacts = {
 };
 
 // Exact-SKU overrides belong here only after the evidence is reviewed and retained.
-const verifiedFactsBySlug: Record<string, Partial<VerifiedProductFacts>> = {};
+const verifiedFactsBySlug: Record<string, Partial<VerifiedProductFacts>> = {
+  "peetal-kadai": {
+    exactImagesApproved: true,
+    capacity: "1 qt.",
+  },
+};
 
 export function productFacts(product: CatalogProduct): VerifiedProductFacts {
   return { ...pendingFacts, ...verifiedFactsBySlug[product.slug] };

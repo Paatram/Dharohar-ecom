@@ -60,7 +60,13 @@ test("server-renders a purchase-ready product detail", async () => {
   assert.equal(response.status, 200);
   const html = await response.text();
   const text = visibleText(html);
-  assert.match(html, /Peetal Kadai/);
+  assert.match(html, /Peetal Kadhai/);
+  assert.match(text, /₹3,999/);
+  assert.match(text, /1 qt\./);
+  assert.match(html, /peetal-kadai-01\.webp/);
+  assert.match(html, /peetal-kadai-04\.webp/);
+  assert.match(html, /Previous Peetal Kadhai image/);
+  assert.match(html, /Next Peetal Kadhai image/);
   assert.match(html, /ProductGallery/);
   assert.match(html, /Frequently paired/);
   assert.match(html, /application\/ld\+json/);
@@ -106,7 +112,7 @@ for (const [pathname, expected] of [
   ["/shipping-returns", "Delivery information for your order"],
   ["/privacy", "Data is collected for clear customer actions"],
   ["/terms", "Terms of using the Dharohar store"],
-  ["/contact?product=peetal-kadai", "Ask about Peetal Kadai"],
+  ["/contact?product=peetal-kadai", "Ask about Peetal Kadhai"],
   ["/search?q=copper", "Results for"],
   ["/gifting", "Given once"],
   ["/trade", "supported like a project"],

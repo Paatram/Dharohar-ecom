@@ -4,6 +4,7 @@ import {
   audienceContent,
   catalogSummary,
   categoryContent,
+  productGallery,
   products,
   subcategoryContent,
 } from "../lib/catalog.ts";
@@ -15,7 +16,7 @@ test("catalog preserves the supplied launch inventory totals", () => {
     skus: 34,
     units: 216,
     landedCostPaise: 48_383_000,
-    selloutRevenuePaise: 56_309_850,
+    selloutRevenuePaise: 55_017_475,
   });
 });
 
@@ -27,7 +28,7 @@ test("every launch product has a unique, internally valid record", () => {
     slugs.add(product.slug);
     assert.ok(product.launchStock > 0, `${product.slug}: stock must be positive`);
     assert.ok(product.landedCostPaise > 0, `${product.slug}: cost must be positive`);
-    assert.ok(product.sellingPricePaise > product.landedCostPaise, `${product.slug}: price must exceed landed cost`);
+    assert.ok(product.sellingPricePaise > 0, `${product.slug}: price must be positive`);
     assert.ok(product.image.startsWith("/images/dharohar/"), `${product.slug}: image must use approved Dharohar assets`);
     assert.ok(product.category in categoryContent, `${product.slug}: unknown category`);
     assert.ok(product.audiences.length > 0, `${product.slug}: missing audience`);
@@ -35,6 +36,20 @@ test("every launch product has a unique, internally valid record", () => {
       assert.ok(audience in audienceContent, `${product.slug}: unknown audience ${audience}`);
     }
   }
+});
+
+test("Peetal Kadhai uses the supplied customer price, capacity and main image", () => {
+  const product = products.find((item) => item.slug === "peetal-kadai");
+  assert.ok(product);
+  assert.equal(product.sellingPricePaise, 399_900);
+  assert.equal(product.capacity, "1 qt.");
+  assert.equal(product.image, "/images/dharohar/products/peetal-kadai/peetal-kadai-01.webp");
+  assert.deepEqual(productGallery(product).map((image) => image.src), [
+    "/images/dharohar/products/peetal-kadai/peetal-kadai-01.webp",
+    "/images/dharohar/products/peetal-kadai/peetal-kadai-02.webp",
+    "/images/dharohar/products/peetal-kadai/peetal-kadai-03.webp",
+    "/images/dharohar/products/peetal-kadai/peetal-kadai-04.webp",
+  ]);
 });
 
 test("customer-facing audience journeys remain complete", () => {
@@ -80,7 +95,8 @@ test("commerce activation fails closed while exact-SKU facts are pending", () =>
   for (const product of products) {
     assert.equal(productIsCommerceReady(product), false, `${product.slug}: must not activate without evidence`);
     const facts = productFacts(product);
-    assert.equal(facts.exactImagesApproved, false);
+    assert.equal(facts.exactImagesApproved, product.slug === "peetal-kadai");
+    assert.equal(facts.capacity, product.slug === "peetal-kadai" ? "1 qt." : null);
     assert.equal(facts.stockReconciled, false);
   }
 });

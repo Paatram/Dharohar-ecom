@@ -62,7 +62,7 @@ export function bundleProducts(bundle: Bundle) {
 }
 
 export function searchProducts(query: string) {
-  const normalised = query.trim().toLowerCase().replace(/pital/g, "peetal").replace(/bronze/g, "kansa").replace(/brass/g, "peetal");
+  const normalised = query.trim().toLowerCase().replace(/pital/g, "peetal").replace(/kadai/g, "kadhai").replace(/bronze/g, "kansa").replace(/brass/g, "peetal");
   if (!normalised) return [];
   return products.filter((product) => {
     const material = materialLabels[product.material];

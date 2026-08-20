@@ -26,6 +26,7 @@ export type CatalogProduct = {
   launchStock: number;
   image: string;
   description: string;
+  capacity?: string;
   featured?: boolean;
 };
 
@@ -189,16 +190,17 @@ export const products: CatalogProduct[] = [
   },
   {
     slug: "peetal-kadai",
-    name: "Peetal Kadai",
+    name: "Peetal Kadhai",
     category: "cookware",
     material: "brass",
     finish: "Plain",
     audiences: ["households", "restaurants", "hotels"],
     landedCostPaise: 572500,
-    sellingPricePaise: 658375,
+    sellingPricePaise: 399900,
     launchStock: 5,
-    image: "/images/dharohar/products/brass-flat-kadhai.webp",
-    description: "A warm brass kadai with a generous profile for curries, frying and table-side presentation.",
+    image: "/images/dharohar/products/peetal-kadai/peetal-kadai-01.webp",
+    description: "A hammered peetal kadhai with a fitted lid and two sturdy handles for everyday cooking and serving.",
+    capacity: "1 qt.",
     featured: true,
   },
   {
@@ -611,6 +613,19 @@ export function findProduct(slug: string) {
 }
 
 export function productGallery(product: CatalogProduct): ProductGalleryImage[] {
+  if (product.slug === "peetal-kadai") {
+    const images = [
+      { src: "/images/dharohar/products/peetal-kadai/peetal-kadai-01.webp", label: "Main view" },
+      { src: "/images/dharohar/products/peetal-kadai/peetal-kadai-02.webp", label: "Lid view" },
+      { src: "/images/dharohar/products/peetal-kadai/peetal-kadai-03.webp", label: "Open view" },
+      { src: "/images/dharohar/products/peetal-kadai/peetal-kadai-04.webp", label: "Interior view" },
+    ];
+    return images.map((image) => ({
+      ...image,
+      alt: `${product.name} — ${image.label.toLowerCase()}`,
+    }));
+  }
+
   const cookware = [
     product.image,
     "/images/dharohar/gallery/brass-kadhai-angle.png",
