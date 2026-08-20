@@ -91,6 +91,19 @@ test("server-renders the exact six-piece steel and copper-lined glass set", asyn
   assert.match(html, /Next Steel Glass Set with Copper Lining — 6 Pieces image/);
 });
 
+test("server-renders the exact Kansa Thali Set", async () => {
+  const response = await render("/products/kansa-thali-set-two");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const text = visibleText(html);
+  assert.match(text, /Kansa Thali Set/);
+  assert.match(text, /₹8,249/);
+  assert.match(html, /kansa-thali-set-01\.webp/);
+  assert.match(html, /kansa-thali-set-06\.webp/);
+  assert.match(html, /Previous Kansa Thali Set image/);
+  assert.match(html, /Next Kansa Thali Set image/);
+});
+
 test("server-renders the device-private Care Circle workflow", async () => {
   const response = await render("/care");
   assert.equal(response.status, 200);

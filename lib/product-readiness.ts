@@ -46,6 +46,9 @@ const verifiedFactsBySlug: Record<string, Partial<VerifiedProductFacts>> = {
     exactImagesApproved: true,
     composition: "Steel with copper lining",
   },
+  "kansa-thali-set-two": {
+    exactImagesApproved: true,
+  },
 };
 
 export function productFacts(product: CatalogProduct): VerifiedProductFacts {

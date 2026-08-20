@@ -550,16 +550,16 @@ export const products: CatalogProduct[] = [
   },
   {
     slug: "kansa-thali-set-two",
-    name: "Kansa Thali Set — 2 Pieces",
+    name: "Kansa Thali Set",
     category: "kitchen-sets",
     material: "kansa",
-    finish: "Plain",
+    finish: "Engraved",
     audiences: ["households", "restaurants", "hotels", "gifting"],
     landedCostPaise: 520000,
-    sellingPricePaise: 598000,
+    sellingPricePaise: 824900,
     launchStock: 2,
-    image: "/images/dharohar/products/kansa-thaali-clean.jpg",
-    description: "A pair of kansa thalis for quiet daily meals and lasting ceremonial gifts.",
+    image: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-01.webp",
+    description: "A coordinated kansa thali set with engraved floral detailing across the dining pieces.",
   },
   {
     slug: "peetal-donga-set-glass-lid",
@@ -617,6 +617,21 @@ export function findProduct(slug: string) {
 }
 
 export function productGallery(product: CatalogProduct): ProductGalleryImage[] {
+  if (product.slug === "kansa-thali-set-two") {
+    const images = [
+      { src: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-01.webp", label: "Complete set" },
+      { src: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-02.webp", label: "Thali setting" },
+      { src: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-03.webp", label: "Katori detail" },
+      { src: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-04.webp", label: "Serving bowl detail" },
+      { src: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-05.webp", label: "Glass detail" },
+      { src: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-06.webp", label: "Spoon detail" },
+    ];
+    return images.map((image) => ({
+      ...image,
+      alt: `${product.name} — ${image.label.toLowerCase()}`,
+    }));
+  }
+
   if (product.slug === "steel-copper-glass-set-six") {
     const images = [
       { src: "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-01.webp", label: "Complete set" },

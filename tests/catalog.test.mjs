@@ -16,7 +16,7 @@ test("catalog preserves the supplied launch inventory totals", () => {
     skus: 34,
     units: 216,
     landedCostPaise: 48_383_000,
-    selloutRevenuePaise: 54_988_725,
+    selloutRevenuePaise: 55_442_525,
   });
 });
 
@@ -67,6 +67,22 @@ test("steel and copper-lined glass set uses the supplied price, set size and ima
   ]);
 });
 
+test("Kansa Thali Set uses the supplied price and exact image order", () => {
+  const product = products.find((item) => item.slug === "kansa-thali-set-two");
+  assert.ok(product);
+  assert.equal(product.name, "Kansa Thali Set");
+  assert.equal(product.sellingPricePaise, 824_900);
+  assert.equal(product.image, "/images/dharohar/products/kansa-thali-set/kansa-thali-set-01.webp");
+  assert.deepEqual(productGallery(product).map((image) => image.src), [
+    "/images/dharohar/products/kansa-thali-set/kansa-thali-set-01.webp",
+    "/images/dharohar/products/kansa-thali-set/kansa-thali-set-02.webp",
+    "/images/dharohar/products/kansa-thali-set/kansa-thali-set-03.webp",
+    "/images/dharohar/products/kansa-thali-set/kansa-thali-set-04.webp",
+    "/images/dharohar/products/kansa-thali-set/kansa-thali-set-05.webp",
+    "/images/dharohar/products/kansa-thali-set/kansa-thali-set-06.webp",
+  ]);
+});
+
 test("customer-facing audience journeys remain complete", () => {
   assert.deepEqual(Object.keys(audienceContent).sort(), [
     "gifting",
@@ -111,7 +127,10 @@ test("commerce activation fails closed while exact-SKU facts are pending", () =>
   for (const product of products) {
     assert.equal(productIsCommerceReady(product), false, `${product.slug}: must not activate without evidence`);
     const facts = productFacts(product);
-    assert.equal(facts.exactImagesApproved, product.slug === "peetal-kadai" || product.slug === "steel-copper-glass-set-six");
+    assert.equal(
+      facts.exactImagesApproved,
+      product.slug === "peetal-kadai" || product.slug === "steel-copper-glass-set-six" || product.slug === "kansa-thali-set-two",
+    );
     assert.equal(facts.capacity, product.slug === "peetal-kadai" ? "1 qt." : null);
     assert.equal(facts.stockReconciled, false);
   }
