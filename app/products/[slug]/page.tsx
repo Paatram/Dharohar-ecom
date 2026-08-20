@@ -34,7 +34,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = findProduct(slug);
   if (!product) notFound();
   const related = products.filter((item) => item.category === product.category && item.slug !== product.slug).slice(0, 4);
-  const materialName = materialLabels[product.material];
+  const materialName = product.materialDetail ?? materialLabels[product.material];
   const matchingBundle = bundles.find((bundle) => bundle.productSlugs.includes(product.slug));
   const uses = productUse(product).map((use) => useLabels[use]).join(" · ");
   const gallery = productGallery(product);
@@ -75,6 +75,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <p className="product-material">{materialName}</p>
             <p className="product-description">{product.description}</p>
             {product.capacity ? <div className="product-variant"><span>Capacity</span><strong>{product.capacity}</strong></div> : null}
+            {product.packSize ? <div className="product-variant"><span>Set contains</span><strong>{product.packSize}</strong></div> : null}
             <div className="product-price"><strong>{formatInr(product.sellingPricePaise)}</strong><small>5% GST calculated at checkout</small></div>
             <div className="product-status"><span>Availability</span><strong>In stock</strong></div>
             <ProductPurchaseActions slug={product.slug} />
@@ -83,6 +84,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div><dt>Material</dt><dd>{materialName}</dd></div>
               <div><dt>Finish</dt><dd>{product.finish}</dd></div>
               {product.capacity ? <div><dt>Capacity</dt><dd>{product.capacity}</dd></div> : null}
+              {product.packSize ? <div><dt>Set contains</dt><dd>{product.packSize}</dd></div> : null}
               <div><dt>Collection</dt><dd>{categoryContent[product.category].name}</dd></div>
               <div><dt>Designed for</dt><dd>{uses}</dd></div>
             </dl>

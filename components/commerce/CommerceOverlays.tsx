@@ -48,7 +48,7 @@ function SearchDialog() {
       </form>
       <p className="search-caption">{query ? `${results.length}${searchProducts(query).length > 6 ? "+" : ""} matching pieces` : "Popular pieces"}</p>
       <div className="search-results">
-        {results.map((product) => <Link href={`/products/${product.slug}`} key={product.slug} onClick={() => setSearchOpen(false)}><Image src={product.image} alt="" width={84} height={96} /><span><strong>{product.name}</strong><small>{materialLabels[product.material]} · {formatInr(product.sellingPricePaise)}</small></span></Link>)}
+        {results.map((product) => <Link href={`/products/${product.slug}`} key={product.slug} onClick={() => setSearchOpen(false)}><Image src={product.image} alt="" width={84} height={96} /><span><strong>{product.name}</strong><small>{product.materialDetail ?? materialLabels[product.material]} · {formatInr(product.sellingPricePaise)}</small></span></Link>)}
         {query && !results.length ? <div className="empty-state"><strong>No exact match yet.</strong><p>Try a metal such as copper, peetal or kansa, or browse the complete collection.</p><Link href="/collections/all" onClick={() => setSearchOpen(false)}>Browse all products</Link></div> : null}
       </div>
     </section>

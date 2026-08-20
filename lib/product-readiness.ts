@@ -42,6 +42,10 @@ const verifiedFactsBySlug: Record<string, Partial<VerifiedProductFacts>> = {
     exactImagesApproved: true,
     capacity: "1 qt.",
   },
+  "steel-copper-glass-set-six": {
+    exactImagesApproved: true,
+    composition: "Steel with copper lining",
+  },
 };
 
 export function productFacts(product: CatalogProduct): VerifiedProductFacts {

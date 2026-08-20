@@ -13,7 +13,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
           fill
           sizes="(max-width: 620px) 88vw, (max-width: 1024px) 45vw, 25vw"
         />
-        <span>{product.material === "brass" ? "Peetal" : product.material === "copper" ? "Tamra" : product.material === "kansa" ? "Kansa" : "Mixed metal"}</span>
+        <span>{product.materialDetail ?? (product.material === "brass" ? "Peetal" : product.material === "copper" ? "Tamra" : product.material === "kansa" ? "Kansa" : "Mixed metal")}</span>
       </Link>
       <ProductCardActions slug={product.slug} />
       <div className="product-card-copy">

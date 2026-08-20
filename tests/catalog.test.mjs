@@ -16,7 +16,7 @@ test("catalog preserves the supplied launch inventory totals", () => {
     skus: 34,
     units: 216,
     landedCostPaise: 48_383_000,
-    selloutRevenuePaise: 55_017_475,
+    selloutRevenuePaise: 54_988_725,
   });
 });
 
@@ -52,6 +52,21 @@ test("Peetal Kadhai uses the supplied customer price, capacity and main image", 
   ]);
 });
 
+test("steel and copper-lined glass set uses the supplied price, set size and image order", () => {
+  const product = products.find((item) => item.slug === "steel-copper-glass-set-six");
+  assert.ok(product);
+  assert.equal(product.sellingPricePaise, 259_900);
+  assert.equal(product.packSize, "6 glasses");
+  assert.equal(product.materialDetail, "Steel with copper lining");
+  assert.equal(product.image, "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-01.webp");
+  assert.deepEqual(productGallery(product).map((image) => image.src), [
+    "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-01.webp",
+    "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-02.webp",
+    "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-03.webp",
+    "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-04.webp",
+  ]);
+});
+
 test("customer-facing audience journeys remain complete", () => {
   assert.deepEqual(Object.keys(audienceContent).sort(), [
     "gifting",
@@ -80,7 +95,8 @@ test("every product belongs to exactly one category subcategory", () => {
 
 test("commerce discovery is complete and typo tolerant", () => {
   assert.ok(searchProducts("pital kadai").some((product) => product.slug === "peetal-kadai"));
-  assert.ok(searchProducts("copper drinking").every((product) => product.material === "copper"));
+  assert.ok(searchProducts("copper drinking").every((product) => product.material === "copper" || product.materialDetail?.toLowerCase().includes("copper")));
+  assert.ok(searchProducts("steel glass set").some((product) => product.slug === "steel-copper-glass-set-six"));
   for (const product of products) assert.ok(productUse(product).length > 0, `${product.slug}: missing use mapping`);
 });
 
@@ -95,7 +111,7 @@ test("commerce activation fails closed while exact-SKU facts are pending", () =>
   for (const product of products) {
     assert.equal(productIsCommerceReady(product), false, `${product.slug}: must not activate without evidence`);
     const facts = productFacts(product);
-    assert.equal(facts.exactImagesApproved, product.slug === "peetal-kadai");
+    assert.equal(facts.exactImagesApproved, product.slug === "peetal-kadai" || product.slug === "steel-copper-glass-set-six");
     assert.equal(facts.capacity, product.slug === "peetal-kadai" ? "1 qt." : null);
     assert.equal(facts.stockReconciled, false);
   }

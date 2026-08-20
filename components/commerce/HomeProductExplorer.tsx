@@ -52,7 +52,7 @@ export function HomeProductExplorer({ initialProducts }: { initialProducts: Cata
     .filter((product) => audience === "all" || product.audiences.includes(audience))
     .filter((product) => finish === "all" || product.finish === finish)
     .filter((product) => product.sellingPricePaise >= selectedBudget.min && product.sellingPricePaise < selectedBudget.max)
-    .filter((product) => !normalisedQuery || `${product.name} ${product.description} ${product.finish} ${materialLabels[product.material]}`.toLowerCase().includes(normalisedQuery))
+    .filter((product) => !normalisedQuery || `${product.name} ${product.description} ${product.finish} ${product.materialDetail ?? materialLabels[product.material]}`.toLowerCase().includes(normalisedQuery))
     .sort((a, b) => sort === "price-low" ? a.sellingPricePaise - b.sellingPricePaise : sort === "price-high" ? b.sellingPricePaise - a.sellingPricePaise : sort === "name" ? a.name.localeCompare(b.name) : Number(Boolean(b.featured)) - Number(Boolean(a.featured))),
   [audience, category, finish, initialProducts, material, normalisedQuery, selectedBudget.max, selectedBudget.min, sort, use]);
 

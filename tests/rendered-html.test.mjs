@@ -77,6 +77,20 @@ test("server-renders a purchase-ready product detail", async () => {
   assert.match(html, /schema.org\/InStock/);
 });
 
+test("server-renders the exact six-piece steel and copper-lined glass set", async () => {
+  const response = await render("/products/steel-copper-glass-set-six");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const text = visibleText(html);
+  assert.match(text, /Steel Glass Set with Copper Lining/);
+  assert.match(text, /₹2,599/);
+  assert.match(text, /6 glasses/);
+  assert.match(html, /steel-copper-glass-set-01\.webp/);
+  assert.match(html, /steel-copper-glass-set-04\.webp/);
+  assert.match(html, /Previous Steel Glass Set with Copper Lining — 6 Pieces image/);
+  assert.match(html, /Next Steel Glass Set with Copper Lining — 6 Pieces image/);
+});
+
 test("server-renders the device-private Care Circle workflow", async () => {
   const response = await render("/care");
   assert.equal(response.status, 200);

@@ -18,7 +18,10 @@ export function ComparisonTable() {
   const selected = products.filter((product) => compare.includes(product.slug));
   if (!selected.length) return <div className="empty-state saved-empty"><strong>Your comparison is empty.</strong><p>Add up to three pieces using the compare control on product cards.</p><Link href="/collections/all">Choose products</Link></div>;
   const rows = [
-    ["Material", (slug: string) => materialLabels[products.find((product) => product.slug === slug)!.material]],
+    ["Material", (slug: string) => {
+      const product = products.find((item) => item.slug === slug)!;
+      return product.materialDetail ?? materialLabels[product.material];
+    }],
     ["Finish", (slug: string) => products.find((product) => product.slug === slug)!.finish],
     ["Use", (slug: string) => productUse(products.find((product) => product.slug === slug)!).join(", ")],
     ["Price", (slug: string) => formatInr(products.find((product) => product.slug === slug)!.sellingPricePaise)],

@@ -26,7 +26,9 @@ export type CatalogProduct = {
   launchStock: number;
   image: string;
   description: string;
+  materialDetail?: string;
   capacity?: string;
+  packSize?: string;
   featured?: boolean;
 };
 
@@ -336,17 +338,19 @@ export const products: CatalogProduct[] = [
     description: "A compact bottle-and-glass pairing made for bedside, desk and personal gifting rituals.",
   },
   {
-    slug: "peetal-glass-set-plain",
-    name: "Peetal Glass Set — Plain, 6 Pieces",
+    slug: "steel-copper-glass-set-six",
+    name: "Steel Glass Set with Copper Lining — 6 Pieces",
     category: "drinkware",
-    material: "brass",
-    finish: "Plain",
+    material: "mixed",
+    materialDetail: "Steel with copper lining",
+    finish: "Engraved",
     audiences: ["households", "restaurants", "hotels", "gifting"],
     landedCostPaise: 238500,
-    sellingPricePaise: 274275,
+    sellingPricePaise: 259900,
     launchStock: 2,
-    image: "/images/dharohar/gallery/brass-davara.jpg",
-    description: "Six restrained peetal glasses composed for family tables, guest service and gifting.",
+    image: "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-01.webp",
+    description: "A six-piece steel glass set with copper-lined interiors and an engraved floral exterior.",
+    packSize: "6 glasses",
   },
   {
     slug: "peetal-glass-set-antique",
@@ -583,7 +587,7 @@ export const subcategoryContent: Record<ProductCategory, ProductSubcategory[]> =
     { slug: "copper-bottles", name: "Copper Bottles", description: "Personal and bedside copper bottles in distinctive finishes.", productSlugs: ["copper-bottle-lasered", "copper-bottle-uv-meena", "copper-bottle-embossed", "copper-bedroom-bottle-lacquered"] },
     { slug: "copper-glasses", name: "Copper Glasses", description: "Copper tumblers for daily hydration and hospitality service.", productSlugs: ["copper-glass-lacquered", "copper-glass-antique", "copper-glass-embossed"] },
     { slug: "bottle-glass-sets", name: "Bottle & Glass Sets", description: "Coordinated copper bottle sets for desks, rooms and gifting.", productSlugs: ["copper-bottle-glass-set-two", "copper-bottle-glass-set-one"] },
-    { slug: "peetal-glass-sets", name: "Peetal Glass Sets", description: "Six-piece brass tumbler sets in plain and antique finishes.", productSlugs: ["peetal-glass-set-plain", "peetal-glass-set-antique"] },
+    { slug: "glass-sets", name: "Glass Sets", description: "Six-piece tumbler sets across steel, copper-lined and peetal constructions.", productSlugs: ["steel-copper-glass-set-six", "peetal-glass-set-antique"] },
   ],
   "kitchen-tools": [
     { slug: "ladles-serving-tools", name: "Ladles & Serving Tools", description: "Palta, serving spoon and kalchul forms for cooking and service.", productSlugs: ["peetal-palta", "peetal-serving-spoon", "kalchul-peetal"] },
@@ -613,6 +617,19 @@ export function findProduct(slug: string) {
 }
 
 export function productGallery(product: CatalogProduct): ProductGalleryImage[] {
+  if (product.slug === "steel-copper-glass-set-six") {
+    const images = [
+      { src: "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-01.webp", label: "Complete set" },
+      { src: "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-02.webp", label: "Single glass" },
+      { src: "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-03.webp", label: "Angled set view" },
+      { src: "/images/dharohar/products/steel-copper-glass-set/steel-copper-glass-set-04.webp", label: "Copper lining" },
+    ];
+    return images.map((image) => ({
+      ...image,
+      alt: `${product.name} — ${image.label.toLowerCase()}`,
+    }));
+  }
+
   if (product.slug === "peetal-kadai") {
     const images = [
       { src: "/images/dharohar/products/peetal-kadai/peetal-kadai-01.webp", label: "Main view" },

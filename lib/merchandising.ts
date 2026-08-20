@@ -65,7 +65,7 @@ export function searchProducts(query: string) {
   const normalised = query.trim().toLowerCase().replace(/pital/g, "peetal").replace(/kadai/g, "kadhai").replace(/bronze/g, "kansa").replace(/brass/g, "peetal");
   if (!normalised) return [];
   return products.filter((product) => {
-    const material = materialLabels[product.material];
+    const material = product.materialDetail ?? materialLabels[product.material];
     const haystack = `${product.name} ${product.description} ${product.finish} ${material} ${product.category} ${productUse(product).join(" ")}`.toLowerCase();
     return normalised.split(/\s+/).every((term) => haystack.includes(term));
   });
