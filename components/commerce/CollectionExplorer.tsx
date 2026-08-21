@@ -20,7 +20,7 @@ export function CollectionExplorer({ initialProducts, initialMaterial, initialUs
   const filtered = useMemo(() => initialProducts
     .filter((product) => material === "all" || product.material === material)
     .filter((product) => use === "all" || productUse(product).includes(use))
-    .filter((product) => availability === "all" || product.launchStock > 0)
+    .filter((product) => availability === "all" || (product.launchStock ?? 0) > 0)
     .filter((product) => product.sellingPricePaise <= price)
     .sort((a, b) => sort === "price-low" ? a.sellingPricePaise - b.sellingPricePaise : sort === "price-high" ? b.sellingPricePaise - a.sellingPricePaise : sort === "name" ? a.name.localeCompare(b.name) : Number(Boolean(b.featured)) - Number(Boolean(a.featured))), [initialProducts, material, use, availability, price, sort]);
 

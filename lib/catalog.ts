@@ -21,9 +21,9 @@ export type CatalogProduct = {
   material: Material;
   finish: string;
   audiences: Audience[];
-  landedCostPaise: number;
+  landedCostPaise: number | null;
   sellingPricePaise: number;
-  launchStock: number;
+  launchStock: number | null;
   image: string;
   description: string;
   materialDetail?: string;
@@ -562,6 +562,19 @@ export const products: CatalogProduct[] = [
     description: "A coordinated kansa thali set with engraved floral detailing across the dining pieces.",
   },
   {
+    slug: "brass-masala-daani",
+    name: "Brass Masala Daani",
+    category: "kitchen-sets",
+    material: "brass",
+    finish: "Engraved",
+    audiences: ["households", "restaurants", "hotels", "gifting"],
+    landedCostPaise: null,
+    sellingPricePaise: 529900,
+    launchStock: null,
+    image: "/images/dharohar/products/brass-masala-daani/brass-masala-daani-01.webp",
+    description: "An engraved brass masala daani with removable inner containers and a serving spoon.",
+  },
+  {
     slug: "peetal-donga-set-glass-lid",
     name: "Peetal Donga Set — Glass Lid",
     category: "kitchen-sets",
@@ -599,6 +612,7 @@ export const subcategoryContent: Record<ProductCategory, ProductSubcategory[]> =
     { slug: "katori-sets", name: "Katori Sets", description: "Six-piece bowl sets across peetal and kansa finishes.", productSlugs: ["peetal-katori-set-plain", "peetal-katori-set-antique", "kansa-katori-set-plain", "kansa-katori-set-antique"] },
     { slug: "thali-sets", name: "Thali Sets", description: "Paired peetal and kansa thalis for everyday and ceremonial tables.", productSlugs: ["peetal-thali-set-two", "kansa-thali-set-two"] },
     { slug: "serving-sets", name: "Serving Sets", description: "Coordinated brass serveware for generous tables and hospitality.", productSlugs: ["peetal-donga-set-glass-lid"] },
+    { slug: "spice-storage", name: "Spice Storage", description: "Organised metal spice boxes for the everyday Indian kitchen.", productSlugs: ["brass-masala-daani"] },
   ],
 };
 
@@ -617,6 +631,19 @@ export function findProduct(slug: string) {
 }
 
 export function productGallery(product: CatalogProduct): ProductGalleryImage[] {
+  if (product.slug === "brass-masala-daani") {
+    const images = [
+      { src: "/images/dharohar/products/brass-masala-daani/brass-masala-daani-01.webp", label: "Main view" },
+      { src: "/images/dharohar/products/brass-masala-daani/brass-masala-daani-02.webp", label: "Open view" },
+      { src: "/images/dharohar/products/brass-masala-daani/brass-masala-daani-03.webp", label: "Top view" },
+      { src: "/images/dharohar/products/brass-masala-daani/brass-masala-daani-04.webp", label: "Alternate view" },
+    ];
+    return images.map((image) => ({
+      ...image,
+      alt: `${product.name} — ${image.label.toLowerCase()}`,
+    }));
+  }
+
   if (product.slug === "kansa-thali-set-two") {
     const images = [
       { src: "/images/dharohar/products/kansa-thali-set/kansa-thali-set-01.webp", label: "Complete set" },
@@ -744,15 +771,16 @@ export function productsForSubcategory(subcategory: ProductSubcategory) {
 
 export function catalogSummary() {
   return products.reduce(
-    (summary, product) => ({
-      skus: summary.skus + 1,
-      units: summary.units + product.launchStock,
-      landedCostPaise:
-        summary.landedCostPaise + product.landedCostPaise * product.launchStock,
-      selloutRevenuePaise:
-        summary.selloutRevenuePaise +
-        product.sellingPricePaise * product.launchStock,
-    }),
+    (summary, product) => {
+      const stock = product.launchStock ?? 0;
+      const landedCost = product.landedCostPaise ?? 0;
+      return {
+        skus: summary.skus + 1,
+        units: summary.units + stock,
+        landedCostPaise: summary.landedCostPaise + landedCost * stock,
+        selloutRevenuePaise: summary.selloutRevenuePaise + product.sellingPricePaise * stock,
+      };
+    },
     { skus: 0, units: 0, landedCostPaise: 0, selloutRevenuePaise: 0 },
   );
 }

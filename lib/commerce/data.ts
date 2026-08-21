@@ -54,7 +54,7 @@ export async function ensureCatalogSeeded(db: D1Database) {
       material = excluded.material,
       finish = excluded.finish,
       indicative_price_paise = excluded.indicative_price_paise
-  `).bind(product.slug, product.name, product.category, product.material, product.finish, product.sellingPricePaise, product.launchStock, now));
+  `).bind(product.slug, product.name, product.category, product.material, product.finish, product.sellingPricePaise, product.launchStock ?? 0, now));
   await db.batch(statements);
 }
 

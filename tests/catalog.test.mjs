@@ -13,7 +13,7 @@ import { productFacts, productIsCommerceReady } from "../lib/product-readiness.t
 
 test("catalog preserves the supplied launch inventory totals", () => {
   assert.deepEqual(catalogSummary(), {
-    skus: 34,
+    skus: 35,
     units: 216,
     landedCostPaise: 48_383_000,
     selloutRevenuePaise: 55_442_525,
@@ -26,8 +26,8 @@ test("every launch product has a unique, internally valid record", () => {
     assert.match(product.slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
     assert.equal(slugs.has(product.slug), false, `duplicate slug: ${product.slug}`);
     slugs.add(product.slug);
-    assert.ok(product.launchStock > 0, `${product.slug}: stock must be positive`);
-    assert.ok(product.landedCostPaise > 0, `${product.slug}: cost must be positive`);
+    if (product.launchStock !== null) assert.ok(product.launchStock > 0, `${product.slug}: stock must be positive`);
+    if (product.landedCostPaise !== null) assert.ok(product.landedCostPaise > 0, `${product.slug}: cost must be positive`);
     assert.ok(product.sellingPricePaise > 0, `${product.slug}: price must be positive`);
     assert.ok(product.image.startsWith("/images/dharohar/"), `${product.slug}: image must use approved Dharohar assets`);
     assert.ok(product.category in categoryContent, `${product.slug}: unknown category`);
@@ -83,6 +83,24 @@ test("Kansa Thali Set uses the supplied price and exact image order", () => {
   ]);
 });
 
+test("Brass Masala Daani uses the supplied price and exact image order without invented facts", () => {
+  const product = products.find((item) => item.slug === "brass-masala-daani");
+  assert.ok(product);
+  assert.equal(product.name, "Brass Masala Daani");
+  assert.equal(product.sellingPricePaise, 529_900);
+  assert.equal(product.launchStock, null);
+  assert.equal(product.landedCostPaise, null);
+  assert.equal(product.capacity, undefined);
+  assert.equal(product.packSize, undefined);
+  assert.equal(product.image, "/images/dharohar/products/brass-masala-daani/brass-masala-daani-01.webp");
+  assert.deepEqual(productGallery(product).map((image) => image.src), [
+    "/images/dharohar/products/brass-masala-daani/brass-masala-daani-01.webp",
+    "/images/dharohar/products/brass-masala-daani/brass-masala-daani-02.webp",
+    "/images/dharohar/products/brass-masala-daani/brass-masala-daani-03.webp",
+    "/images/dharohar/products/brass-masala-daani/brass-masala-daani-04.webp",
+  ]);
+});
+
 test("customer-facing audience journeys remain complete", () => {
   assert.deepEqual(Object.keys(audienceContent).sort(), [
     "gifting",
@@ -129,7 +147,7 @@ test("commerce activation fails closed while exact-SKU facts are pending", () =>
     const facts = productFacts(product);
     assert.equal(
       facts.exactImagesApproved,
-      product.slug === "peetal-kadai" || product.slug === "steel-copper-glass-set-six" || product.slug === "kansa-thali-set-two",
+      product.slug === "peetal-kadai" || product.slug === "steel-copper-glass-set-six" || product.slug === "kansa-thali-set-two" || product.slug === "brass-masala-daani",
     );
     assert.equal(facts.capacity, product.slug === "peetal-kadai" ? "1 qt." : null);
     assert.equal(facts.stockReconciled, false);

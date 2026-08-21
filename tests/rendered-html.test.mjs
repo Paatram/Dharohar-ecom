@@ -36,7 +36,7 @@ test("server-renders the Dharohar storefront", async () => {
   assert.match(html, /Next featured collection/);
   assert.equal((html.match(/Show slide \d:/g) ?? []).length, 4, "the hero must offer four directly selectable slides");
   assert.doesNotMatch(html, /#b78b3c|#e2c580|226,\s*197,\s*128/i, "legacy gold-brown theme values must not return");
-  assert.match(text, /All products 34/);
+  assert.match(text, /All products 35/);
   assert.match(html, /category-filter-toggles/);
   assert.match(html, /home-filter-panel/);
   assert.match(text, /All prices/);
@@ -104,6 +104,21 @@ test("server-renders the exact Kansa Thali Set", async () => {
   assert.match(html, /Next Kansa Thali Set image/);
 });
 
+test("server-renders the exact Brass Masala Daani without claiming unknown stock", async () => {
+  const response = await render("/products/brass-masala-daani");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const text = visibleText(html);
+  assert.match(text, /Brass Masala Daani/);
+  assert.match(text, /₹5,299/);
+  assert.match(text, /Confirmed before payment/);
+  assert.match(html, /brass-masala-daani-01\.webp/);
+  assert.match(html, /brass-masala-daani-04\.webp/);
+  assert.match(html, /Previous Brass Masala Daani image/);
+  assert.match(html, /Next Brass Masala Daani image/);
+  assert.doesNotMatch(html, /schema.org\/InStock/);
+});
+
 test("server-renders the device-private Care Circle workflow", async () => {
   const response = await render("/care");
   assert.equal(response.status, 200);
@@ -127,7 +142,7 @@ test("care-plan interest pre-fills the enquiry subject", async () => {
 });
 
 for (const [pathname, expected] of [
-  ["/collections/all", "34 pieces"],
+  ["/collections/all", "35 pieces"],
   ["/collections/cookware/tawas", "Dosa Tawa"],
   ["/collections/drinkware/copper-bottles", "Copper Bottle"],
   ["/collections/kitchen-tools/cutlery", "Peetal Fork"],

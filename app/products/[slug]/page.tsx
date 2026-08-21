@@ -38,6 +38,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const matchingBundle = bundles.find((bundle) => bundle.productSlugs.includes(product.slug));
   const uses = productUse(product).map((use) => useLabels[use]).join(" · ");
   const gallery = productGallery(product);
+  const inventoryKnown = product.launchStock !== null;
   const pairings = [...(matchingBundle ? bundleProducts(matchingBundle) : []), ...related]
     .filter((item, index, items) => item.slug !== product.slug && items.findIndex((candidate) => candidate.slug === item.slug) === index)
     .slice(0, 4);
@@ -48,7 +49,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
     description: product.description,
     image: gallery.map((image) => absoluteUrl(image.src)),
     material: materialName,
-    offers: { "@type": "Offer", priceCurrency: "INR", price: (product.sellingPricePaise / 100).toFixed(2), availability: "https://schema.org/InStock", url: absoluteUrl(`/products/${product.slug}`) },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "INR",
+      price: (product.sellingPricePaise / 100).toFixed(2),
+      url: absoluteUrl(`/products/${product.slug}`),
+      ...(inventoryKnown ? { availability: "https://schema.org/InStock" } : {}),
+    },
   };
   const breadcrumbData = {
     "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
@@ -77,7 +84,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {product.capacity ? <div className="product-variant"><span>Capacity</span><strong>{product.capacity}</strong></div> : null}
             {product.packSize ? <div className="product-variant"><span>Set contains</span><strong>{product.packSize}</strong></div> : null}
             <div className="product-price"><strong>{formatInr(product.sellingPricePaise)}</strong><small>5% GST calculated at checkout</small></div>
-            <div className="product-status"><span>Availability</span><strong>In stock</strong></div>
+            <div className="product-status"><span>Availability</span><strong>{inventoryKnown ? "In stock" : "Confirmed before payment"}</strong></div>
             <ProductPurchaseActions slug={product.slug} />
             <DeliveryChecker />
             <dl className="product-facts">

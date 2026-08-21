@@ -49,6 +49,9 @@ const verifiedFactsBySlug: Record<string, Partial<VerifiedProductFacts>> = {
   "kansa-thali-set-two": {
     exactImagesApproved: true,
   },
+  "brass-masala-daani": {
+    exactImagesApproved: true,
+  },
 };
 
 export function productFacts(product: CatalogProduct): VerifiedProductFacts {
